@@ -1,7 +1,6 @@
 <?php
   include 'ReturnResult.php';
-  $_POST['username'] = "test";
-  $_POST['password'] = "123";
+  
   function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
   {
   switch ($theType) {
@@ -24,30 +23,40 @@
   }
   return $theValue;
   }
+
+  function str_to_utf8 ($str = '') {
+  
+  $current_encode = mb_detect_encoding($str, array("ASCII","GB2312","GBK",'BIG5','UTF-8'));
+  
+  $encoded_str = mb_convert_encoding($str, 'UTF-8', $current_encode);
+  
+  return $encoded_str;
+  
+  }
+
   //登入
   function login($username,$password){
      //SQL語法
-     $sql = sprintf("SELECT *
-                       FROM member
-                      WHERE USERNAME = %s
-                        AND PASSWORD = %s",
-                            GetSQLValueString($username, "text"),
-                            GetSQLValueString($password, "text"));
+     $sql = "SELECT *
+               FROM member
+              WHERE USERNAME = ?
+                AND PASSWORD = ?";
+     $ss = 'ss';
+     $params = [$username,$password];
      //解析回應資料    
-     $returnData = json_decode(SelectResult($sql), true);
+     $returnData = json_decode(SelectResult($sql,$ss,$params), true);
      if(count($returnData)> 0){
         //產生TOKEN
         $token = md5(uniqid());
         
-        $sql = sprintf("UPDATE member
-                           SET TOKEN = %s
-                         WHERE member.USERNAME = %s
-                           AND member.PASSWORD = %s",
-                               GetSQLValueString($token, "text"),
-                               GetSQLValueString($username, "text"),
-                               GetSQLValueString($password, "text"));
+        $sql = "UPDATE member
+                   SET TOKEN = ?
+                 WHERE member.USERNAME = ?
+                   AND member.PASSWORD = ?";
+        $ss = 'sss';
+        $params = [$token,$username,$password];
         //解析回應資料    
-        if(UpdateResult($sql)){
+        if(UpdateResult($sql,$ss,$params)){
             $data = array('TOKEN' => $token,
                           'username' =>$username);
             echo OutputResult("","1",$data);
@@ -62,14 +71,14 @@
   function checkResult(){
   if(isset($_COOKIE['username'])) {
   //SQL語法
-  $sql = sprintf("SELECT *
-                    FROM member
-                   WHERE USERNAME = %s
-                     AND TOKEN = %s",
-                         GetSQLValueString($_COOKIE['username'], "text"),
-                         GetSQLValueString($_COOKIE['TOKEN'], "text"));
+  $sql = "SELECT *
+            FROM member
+           WHERE USERNAME = ?
+             AND TOKEN = ?"; 
+   $ss = 'ss';
+   $params = [$_COOKIE['username'],$_COOKIE['TOKEN']];
    //解析回應資料    
-   $returnData = json_decode(SelectResult($sql), true);
+   $returnData = json_decode(SelectResult($sql,$ss,$params), true);
    if(count($returnData)> 0){
    $arr = array('null' => "");
    echo OutputResult("","1",$arr);
@@ -86,14 +95,14 @@
   //回傳檢查結果 FOR PHP
   function check(){
     //SQL語法
-  $sql = sprintf("SELECT *
-                    FROM member
-                   WHERE USERNAME = %s
-                     AND TOKEN = %s",
-                         GetSQLValueString($_COOKIE['username'], "text"),
-                         GetSQLValueString($_COOKIE['TOKEN'], "text"));
+  $sql = "SELECT *
+            FROM member
+           WHERE USERNAME = ?
+             AND TOKEN = ?"; 
+     $ss = 'ss';
+     $params = [$_COOKIE['username'],$_COOKIE['TOKEN']];
      //解析回應資料    
-     $returnData = json_decode(SelectResult($sql), true);
+     $returnData = json_decode(SelectResult($sql,$ss,$params), true);
      if(count($returnData)> 0){
         return true;
      }
@@ -102,31 +111,27 @@
      }
   }
   //發表
-  function postResult($content){
+  function postResult($content,$POWER){
      if(check()){
       $today = date('Y/m/d H:i:s');
-      $UUID = substr( strip_tags($content) , 0 , 10)."_".$today;
-      //SQL語法
-      $sql = sprintf("INSERT INTO article 
-                                 (`UUID`,
-                                  `CONTENT`,
-                                  `TOPIC`,
-                                  `AUTHOR`,
-                                  `POWER`)
-                           VALUES(%s,
-                                  %s,
-                                  %s,
-                                  %s,
-                                  %s)",
-                             GetSQLValueString($UUID, "text"),
-                             GetSQLValueString($content, "text"),
-                             GetSQLValueString("", "text"),
-                             GetSQLValueString($_COOKIE['username'], "text"),
-                             GetSQLValueString("0", "text"));
-      //解析回應資料    
       
-        //解析回應資料    
-      if(UpdateResult($sql)){
+      $UUID = mb_substr( strip_tags($content) , 0 , 10,'UTF-8')."_".$today;
+      //SQL語法
+      $sql = "INSERT INTO article 
+                         (`UUID`,
+                          `CONTENT`,
+                          `TOPIC`,
+                          `AUTHOR`,
+                          `POWER`)
+                   VALUES(?,
+                          ?,
+                          ?,
+                          ?,
+                          ?)";
+      $ss="sssss";
+      $params = [$UUID, $content, "", $_COOKIE['username'], $POWER];
+      //解析回應資料     
+      if(UpdateResult($sql,$ss,$params)){
           $arr = array('null' => "");
           echo OutputResult("","1",$arr);
       }
@@ -135,6 +140,54 @@
        $arr = array('null' => "");
        echo OutputResult("沒有發表權限","0",$arr);
      }
+  }
+  //回傳檢查結果 FOR VUE
+  function AticleResult(){
+  if(isset($_COOKIE['username'])) {
+    if(check()){
+     //SQL語法
+     $sql = "SELECT *
+               FROM article
+              WHERE POWER < (SELECT POWER
+                               FROM member
+                              WHERE USERNAME = ?
+                                AND TOKEN =?)
+              ORDER BY CREATETIME DESC
+              LIMIT 5";
+      //解析回應資料    
+      $returnData = SelectResult($sql,"ss",[$_COOKIE['username'],$_COOKIE['TOKEN']]);
+      
+      if(strlen($returnData)> 0){    
+        echo OutputResult("","1",$returnData);
+      }
+      else{
+        $arr = array('null' => "");
+        echo OutputResult("","1",$arr);
+      }
+  }else{
+    defaultSearch();
+  }
+  }else{
+    defaultSearch();
+  }
+  }
+  function defaultSearch(){
+    //SQL語法
+    $sql = "SELECT *
+              FROM article
+            WHERE POWER = 0
+              AND 1 = ?
+             ORDER BY CREATETIME DESC
+            LIMIT 5";
+    //解析回應資料    
+    $returnData = SelectResult($sql,"s",[1]);
+    if(strlen($returnData)> 0){
+    echo OutputResult("","1",$returnData);
+    }
+    else{
+    $arr = array('null' => "");
+    echo OutputResult("","1",$arr);
+    }
   }
 
   function main(){
@@ -148,8 +201,11 @@
         checkResult();
         break;
         case "post":
-         postResult($_POST['content']);
+         postResult($_POST['content'],$_POST['POWER']);
          break;
+        case "getAticle":
+          AticleResult();
+          break;
     }
   }
   main();

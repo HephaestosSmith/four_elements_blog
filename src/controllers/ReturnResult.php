@@ -12,36 +12,57 @@ function CreateResult($tablename,$sql){
       }
   }
   catch(Exception $e) {
-    echo 'Message: ' .$e->getMessage();
+    echo 'Message:' .$e->getMessage();
   }
   $conn->close();
 }
 
-function SelectResult($sql){
+function SelectResult($sql,$ss,$param){
   include 'Conection.php';
   try {
-      $query = $conn->query($sql);
-      $data = $query->fetch_all(MYSQLI_ASSOC);
-      $conn->close();
+    $data = array();
+    if($ss != ""){
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param($ss,...$param);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+          $data[] = $row;
+        }  
+        $stmt->close();
+        $conn->close();
+      } else{
+        $query = $conn->query($sql);
+        $data = $query->fetch_all(MYSQLI_ASSOC);
+        $conn->close();
+      }
       return json_encode($data);
   }
   catch(Exception $e) {
+    if($ss != ""){
+    //$stmt->close();
+    }
     $conn->close();
-    $msg = '"msg":"'.$e->getMessage().'"';
+    $msg = 'Message:'.$e->getMessage();
     return json_encode($msg);
   }
 }
 
-function UpdateResult($sql){
+function UpdateResult($sql,$ss,$param){
   include 'Conection.php';
   try {
-      $query = $conn->query($sql);
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param($ss,...$param);
+      $stmt->execute();
+      $result = $stmt->get_result();
+      $stmt->close();
       $conn->close();
       return true;
   }
   catch(Exception $e) {
+    $stmt->close();
     $conn->close();
-    $msg = '"msg":"'.$e->getMessage().'"';
+    $msg = 'Message:'.$e->getMessage();
     echo json_encode($msg);
     return false;
   }
@@ -56,13 +77,18 @@ function OutputResult($msg,$success,$data){
   $Output = Tojson($result); 
   $Output =  str_replace('"{','{',$Output);
   $Output =  str_replace('}"','}',$Output);
+  $Output =  str_replace('"[','[',$Output);
+  $Output =  str_replace(']"',']',$Output);
   return $Output; 
 }
 
 function Tojson($inputData){
-  foreach ( $inputData as $key => $value ) { 
-  $inputData[$key] = urlencode ( $value ); 
-  } 
-  return urldecode(json_encode($inputData)); 
+  if(is_array($inputData)){
+    foreach ( $inputData as $key => $value ) { 
+      $inputData[$key] = urlencode ( $value ); 
+      } 
+      return urldecode(json_encode($inputData)); 
+  }else
+    return $inputData;
 }
 ?>

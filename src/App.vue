@@ -7,7 +7,7 @@
     <div class="col-sm-1">
     </div>
     <div class="col-sm-8">
-       <router-view/>
+       <router-view  v-if="isRouterAlive"/>
     </div>
     <div class="col-sm-1">
        <router-view  class="view RightList" name="RightList" />
@@ -20,8 +20,25 @@
 </template>
 <script>
 export default {
+  provide(){    
+    return {
+      reload: this.reload      
+    }
+  },
+  data() {
+    return {
+      isRouterAlive: true,
+     }
+  },
   created() {
+    document.title = "四元素部落格";
     document.getElementsByTagName("body")[0].className="bg-secondary";
+  },
+  methods: {
+    reload () {
+      this.isRouterAlive = false;
+      this.$nextTick( ()=> { this.isRouterAlive=true } ) ;
+    }
   }
 }
 </script>
