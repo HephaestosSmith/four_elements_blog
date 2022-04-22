@@ -14,7 +14,8 @@ export default createStore({
     axios:axios,
     phpPath:'/controllers/',
     phpType:'.php',
-    Cookies:Cookies
+    Cookies:Cookies,
+    logined:false
   },
   getters: {
     phpurl: (state) => (name) => {

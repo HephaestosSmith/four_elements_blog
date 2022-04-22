@@ -26,7 +26,7 @@
            <div class="row">
                 <div class="col-9">
                 </div>
-                <div class="col-3">
+                <div class="col-3 text-right">
                    {{ item.CREATEDATE }}
                 </div>
            </div>
@@ -40,7 +40,7 @@
               <div class="col-10 col-md-9">
                     發文時間:{{ item.CREATETIME }}
               </div>
-              <div class="col-md-3">
+              <div class="col-md-3 text-right">
                   作者: {{item.AUTHOR}}
               </div>
            </div>
