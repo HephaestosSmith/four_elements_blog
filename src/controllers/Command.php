@@ -145,17 +145,35 @@
   function AticleResult(){
   if(isset($_COOKIE['username'])) {
     if(check()){
-     //SQL語法
-     $sql = "SELECT *
-               FROM article
-              WHERE POWER < (SELECT POWER
-                               FROM member
-                              WHERE USERNAME = ?
-                                AND TOKEN =?)
-              ORDER BY CREATETIME DESC
-              LIMIT 5";
-      //解析回應資料    
-      $returnData = SelectResult($sql,"ss",[$_COOKIE['username'],$_COOKIE['TOKEN']]);
+     if (isset($_POST['CREATETIME'])){
+      //SQL語法
+      $sql = "SELECT *,
+                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                FROM article
+               WHERE POWER < (SELECT POWER
+                                FROM member
+                               WHERE USERNAME = ?
+                                 AND TOKEN =?)
+                 AND CREATETIME < ?
+               ORDER BY CREATETIME DESC
+               LIMIT 5";
+       //解析回應資料    
+       $returnData = SelectResult($sql,"sss",[$_COOKIE['username'],$_COOKIE['TOKEN'],$_POST['CREATETIME']]);
+
+     }else{
+      //SQL語法
+      $sql = "SELECT *,
+                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                FROM article
+               WHERE POWER < (SELECT POWER
+                                FROM member
+                               WHERE USERNAME = ?
+                                 AND TOKEN =?)
+               ORDER BY CREATETIME DESC
+               LIMIT 5";
+       //解析回應資料    
+       $returnData = SelectResult($sql,"ss",[$_COOKIE['username'],$_COOKIE['TOKEN']]);
+     }
       
       if(strlen($returnData)> 0){    
         echo OutputResult("","1",$returnData);
@@ -172,15 +190,31 @@
   }
   }
   function defaultSearch(){
-    //SQL語法
-    $sql = "SELECT *
-              FROM article
-            WHERE POWER = 0
-              AND 1 = ?
-             ORDER BY CREATETIME DESC
-            LIMIT 5";
-    //解析回應資料    
-    $returnData = SelectResult($sql,"s",[1]);
+    //loading使用
+    if (isset($_POST['CREATETIME'])){
+      //SQL語法
+      $sql = "SELECT *,
+                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                FROM article
+              WHERE POWER = 0
+                AND CREATETIME < ?
+               ORDER BY CREATETIME DESC
+              LIMIT 5";
+      //解析回應資料    
+      $returnData = SelectResult($sql,"s",[$_POST['CREATETIME']]);
+    }
+    else{
+      //SQL語法
+      $sql = "SELECT *,
+                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                FROM article
+              WHERE POWER = 0
+                AND 1 = ?
+               ORDER BY CREATETIME DESC
+              LIMIT 5";
+      //解析回應資料    
+      $returnData = SelectResult($sql,"s",[1]);
+    }
     if(strlen($returnData)> 0){
     echo OutputResult("","1",$returnData);
     }

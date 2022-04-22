@@ -1,5 +1,5 @@
 <template>
-<div class="container-fluid" id="main">
+<div class="container-fluid" id="main"  v-if="isRouterAlive">
   <div class="row bg-dark"  id="Header">
      <router-view name="Header"/>
   </div>
@@ -7,7 +7,7 @@
     <div class="col-sm-1">
     </div>
     <div class="col-sm-8">
-       <router-view  v-if="isRouterAlive"/>
+       <router-view/>
     </div>
     <div class="col-sm-1">
        <router-view  class="view RightList" name="RightList" />
