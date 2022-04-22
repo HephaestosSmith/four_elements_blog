@@ -31,7 +31,7 @@ export default {
      }
   },
   created() {
-    document.title = "四元素部落格";
+    //document.title = "四元素部落格";
     document.getElementsByTagName("body")[0].className="bg-secondary";
   },
   methods: {
