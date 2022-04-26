@@ -39,8 +39,8 @@
     </li> -->
   </ul>
   <div class="form-inline my-2 my-lg-0">
-  <input class="form-control mr-sm-2" type="search" placeholder="Search" v-model="SearchData" >
-  <button class="btn btn-outline-success " @click="HeaderSearch(true)" >Search</button>
+  <input class="form-control mr-sm-2" type="search" placeholder="輸入關鍵字" v-model="SearchData" >
+  <button class="btn btn-outline-success " @click="HeaderSearch(true)" >查詢</button>
   </div>
   </div>
 </nav>
