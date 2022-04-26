@@ -39,8 +39,8 @@
       <div class="col">
            <div class="row">
                 <div class="col-9">
-                    <div class="row">
-                      <a class="btn btn-info" @click="post(item.UUID)"  style="width:80px; height:35px; margin-left: 10px;">修改</a>
+                    <div class="row" v-if="loginstatus()">
+                      <router-link class="btn btn-info"  to="/fixed"  style="width:80px; height:35px; margin-left: 10px;">修改</router-link>
                       <a class="btn btn-danger" @click="Delete(item.UUID)"  style="width:80px; height:35px; margin-left: 10px;">刪除</a>
                     </div>
                 </div>
@@ -104,26 +104,23 @@ import { useStore } from 'vuex'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 export default {
-    data() {
-        return {
-            POWER:'1',
-            editor: ClassicEditor,
-            editorData: '',
-            editorConfig: {
-                // The configuration of the editor.
-            },
-            loading:false,
-            CATEGORY:'',
-            CATEGORYS:[]
-        };
-    },
-    created(){
-       this.useStore = useStore();
-       this.Logined();
-       this.getAticle(false);
-       this.useStore.state.SEARCHTYPE = 'default';
-       window.addEventListener("scroll", this.handleScroll);
-    },
+  data() {
+      return {
+          POWER:'1',
+          editor: ClassicEditor,
+          editorData: '',
+          editorConfig: {
+              // The configuration of the editor.
+          },
+          loading:false,
+          CATEGORY:'',
+          CATEGORYS:[]
+      };
+  },
+  created(){
+     this.useStore = useStore();
+     this.Logined();
+  },
   methods:{
       loginstatus(){
          return this.useStore.state.logined;
@@ -131,11 +128,18 @@ export default {
       Logined(){
       let me = this;
       let useStore = me.useStore;
+      let state = me.useStore.state;
       let http = useStore.state.axios;
       let phpurl = useStore.getters.phpurl;
-      
       let data = new URLSearchParams();
+
+      state.SEARCHTYPE = 'default';
       data.append('commandType', "check");
+
+      if (!state.Createflag){
+        state.Createflag = true;
+        window.addEventListener('scroll', this.handleScroll, true);
+      }
 
       http.post(phpurl("Command"),data)
       .then(function(response){
@@ -147,6 +151,7 @@ export default {
        else{
            useStore.state.logined = false;
        }
+       me.getAticle(false);
       })
       .catch(function (error) {
        alert(error);
@@ -202,6 +207,7 @@ export default {
        me.loading = false;
        alert(error);
       });
+      
   },
   post(){
       let me = this;
@@ -237,8 +243,8 @@ export default {
   handleScroll(){
       let me = this;
       let state = me.useStore.state;
-      if (!me.loading & !state.noDataFlag){
-          if (window.scrollY + document.documentElement.clientHeight >= document.body.scrollHeight - 5) {
+      if (window.scrollY + document.documentElement.clientHeight >= document.body.scrollHeight - 5) {
+          if (!me.loading & !state.noDataFlag){
               me.loading = true;
               me.getAticle(false);
           }

@@ -12,7 +12,7 @@
        <router-view/>
     </div>
     <div class="d-none d-xl-block col-xl-2 bd-toc">
-       <router-view  class="view RightList" name="RightList" />
+       <router-view name="RightList" />
     </div>
   </div>
   <!--<div class="row"  id="Footer">

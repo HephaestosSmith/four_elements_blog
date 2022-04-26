@@ -14,6 +14,7 @@ export default {
   login(){
       let me = this;
       let useStore = me.useStore;
+      let state = me.useStore.state;
       let http = useStore.state.axios;
       let phpurl = useStore.getters.phpurl;
       let Cookies = useStore.state.Cookies;
@@ -30,6 +31,8 @@ export default {
            Cookies.set('TOKEN',result.TOKEN, { expires: 1 });
            Cookies.set('username',result.username, { expires: 1 });
            Cookies.set('authorname',result.authorname, { expires: 1 });
+           state.list = [];
+           state.noDataFlag = false;
            me.$router.push('/')
        }
        else{

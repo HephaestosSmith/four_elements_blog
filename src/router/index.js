@@ -37,6 +37,17 @@ const routes = [
       RightList:RightListView
     },
     meta:{ requiresAuth: true}
+  },
+  {
+    path: '/fixed',
+    name: 'fixed',
+    components: {
+      default: loginView,
+      Header:HeaderView,
+      Footer:FooterView,
+      RightList:RightListView
+    },
+    meta:{ requiresAuth: false}
   }
 ]
 

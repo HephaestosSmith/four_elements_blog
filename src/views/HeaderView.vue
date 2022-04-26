@@ -92,8 +92,13 @@ export default {
   },
   logout(){
       let me = this;
+      let state = me.useStore.state;
       Cookies.delete('username');
       Cookies.delete('TOKEN');
+      Cookies.delete('authorname');
+      state.list = [];
+      state.logined = false;
+      state.noDataFlag = false;
       me.reload();
   },
   HeaderSearch(flag){

@@ -19,7 +19,8 @@ export default createStore({
     list:[],
     KEYWORD:'',
     noDataFlag:false,
-    SEARCHTYPE:'default'
+    SEARCHTYPE:'default',
+    Createflag:false
   },
   getters: {
     phpurl: (state) => (name) => {
