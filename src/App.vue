@@ -1,15 +1,17 @@
 <template>
 <div class="container-fluid" id="main"  v-if="isRouterAlive">
-  <div class="row bg-dark"  id="Header">
+  <div class="row bg-dark sticky-top"  id="Header">
+    <div class="col-12">
      <router-view name="Header"/>
-  </div>
-  <div class="row"  style="height: 850px;">
-    <div class="col-sm-1">
     </div>
-    <div class="col-sm-8">
+  </div>
+  <div class="row">
+    <div class="d-none d-md-block col-md-2 bd-toc">
+    </div>
+    <div class="col-md-8">
        <router-view/>
     </div>
-    <div class="col-sm-1">
+    <div class="d-none d-xl-block col-xl-2 bd-toc">
        <router-view  class="view RightList" name="RightList" />
     </div>
   </div>

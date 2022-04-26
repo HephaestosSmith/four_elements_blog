@@ -29,6 +29,7 @@ export default {
        if (success == "1"){
            Cookies.set('TOKEN',result.TOKEN, { expires: 1 });
            Cookies.set('username',result.username, { expires: 1 });
+           Cookies.set('authorname',result.authorname, { expires: 1 });
            me.$router.push('/')
        }
        else{

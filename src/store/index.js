@@ -15,7 +15,11 @@ export default createStore({
     phpPath:'/controllers/',
     phpType:'.php',
     Cookies:Cookies,
-    logined:false
+    logined:false,
+    list:[],
+    KEYWORD:'',
+    noDataFlag:false,
+    SEARCHTYPE:'default'
   },
   getters: {
     phpurl: (state) => (name) => {

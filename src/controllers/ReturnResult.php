@@ -48,7 +48,7 @@ function SelectResult($sql,$ss,$param){
   }
 }
 
-function UpdateResult($sql,$ss,$param){
+function CommandResult($sql,$ss,$param){
   include 'Conection.php';
   try {
       $stmt = $conn->prepare($sql);

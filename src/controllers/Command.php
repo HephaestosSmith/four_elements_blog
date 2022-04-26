@@ -35,7 +35,7 @@
   }
 
   //登入
-  function login($username,$password){
+  function LoginResult($username,$password){
      //SQL語法
      $sql = "SELECT *
                FROM member
@@ -48,7 +48,8 @@
      if(count($returnData)> 0){
         //產生TOKEN
         $token = md5(uniqid());
-        
+        $data = $returnData[0];
+        $authorname = $data["AUTHORNAME"];
         $sql = "UPDATE member
                    SET TOKEN = ?
                  WHERE member.USERNAME = ?
@@ -56,9 +57,10 @@
         $ss = 'sss';
         $params = [$token,$username,$password];
         //解析回應資料    
-        if(UpdateResult($sql,$ss,$params)){
+        if(CommandResult($sql,$ss,$params)){
             $data = array('TOKEN' => $token,
-                          'username' =>$username);
+                          'username' =>$username,
+                          'authorname' =>$authorname);
             echo OutputResult("","1",$data);
          }
      }
@@ -68,7 +70,7 @@
      }
   }
   //回傳檢查結果 FOR VUE
-  function checkResult(){
+  function CheckResult(){
   if(isset($_COOKIE['username'])) {
   //SQL語法
   $sql = "SELECT *
@@ -111,7 +113,7 @@
      }
   }
   //發表
-  function postResult($content,$POWER){
+  function PostResult($content,$POWER,$CATEGORY){
      if(check()){
       $today = date('Y/m/d H:i:s');
       
@@ -122,18 +124,24 @@
                           `CONTENT`,
                           `TOPIC`,
                           `AUTHOR`,
-                          `POWER`)
+                          `POWER`,
+                          `CATEGORY`)
                    VALUES(?,
                           ?,
                           ?,
                           ?,
+                          ?,
                           ?)";
-      $ss="sssss";
-      $params = [$UUID, $content, "", $_COOKIE['username'], $POWER];
+      $ss="ssssss";
+      $params = [$UUID, $content, "", $_COOKIE['authorname'], $POWER,$CATEGORY];
       //解析回應資料     
-      if(UpdateResult($sql,$ss,$params)){
+      if(CommandResult($sql,$ss,$params)){
           $arr = array('null' => "");
           echo OutputResult("","1",$arr);
+      }
+      else{
+        $arr = array('null' => "");
+        echo OutputResult("沒有發表權限","0",$arr);
       }
      }
      else{
@@ -141,8 +149,9 @@
        echo OutputResult("沒有發表權限","0",$arr);
      }
   }
-  //回傳檢查結果 FOR VUE
-  function AticleResult(){
+
+  //回傳一般查詢結果 FOR VUE
+  function DefaultResult(){
   if(isset($_COOKIE['username'])) {
     if(check()){
      if (isset($_POST['CREATETIME'])){
@@ -157,9 +166,10 @@
                  AND CREATETIME < ?
                ORDER BY CREATETIME DESC
                LIMIT 5";
-       //解析回應資料    
-       $returnData = SelectResult($sql,"sss",[$_COOKIE['username'],$_COOKIE['TOKEN'],$_POST['CREATETIME']]);
-
+       //解析回應資料
+       $ss = "sss";
+       $arry = [$_COOKIE['username'],$_COOKIE['TOKEN'],$_POST['CREATETIME']];
+       $returnData = SelectResult($sql,$ss,$arry);
      }else{
       //SQL語法
       $sql = "SELECT *,
@@ -171,8 +181,11 @@
                                  AND TOKEN =?)
                ORDER BY CREATETIME DESC
                LIMIT 5";
+
        //解析回應資料    
-       $returnData = SelectResult($sql,"ss",[$_COOKIE['username'],$_COOKIE['TOKEN']]);
+       $ss = "ss";
+       $arry = [$_COOKIE['username'],$_COOKIE['TOKEN']];
+       $returnData = SelectResult($sql,$ss,$arry);
      }
       
       if(strlen($returnData)> 0){    
@@ -201,7 +214,9 @@
                ORDER BY CREATETIME DESC
               LIMIT 5";
       //解析回應資料    
-      $returnData = SelectResult($sql,"s",[$_POST['CREATETIME']]);
+       $ss = "s";
+       $arry = [$_POST['CREATETIME']];
+       $returnData = SelectResult($sql,$ss,$arry);
     }
     else{
       //SQL語法
@@ -213,7 +228,9 @@
                ORDER BY CREATETIME DESC
               LIMIT 5";
       //解析回應資料    
-      $returnData = SelectResult($sql,"s",[1]);
+       $ss = "s";
+       $arry = [1];
+       $returnData = SelectResult($sql,$ss,$arry);
     }
     if(strlen($returnData)> 0){
     echo OutputResult("","1",$returnData);
@@ -223,24 +240,182 @@
     echo OutputResult("","1",$arr);
     }
   }
+  
+  //回傳關鍵字查詢結果 FOR VUE
+  function KeywordResult($KEYWORD){
+    if(isset($_COOKIE['username'])) {
+      if(check()){
+       if (isset($_POST['CREATETIME'])){
+        //SQL語法
+        $sql = "SELECT *,
+                       date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                  FROM article
+                 WHERE POWER < (SELECT POWER
+                                  FROM member
+                                 WHERE USERNAME = ?
+                                   AND TOKEN =?)
+                   AND CREATETIME < ?
+                   AND CONTENT LIKE ?
+                 ORDER BY CREATETIME DESC
+                 LIMIT 5";
+         //解析回應資料
+         $ss = "ssss";
+         $arry = [$_COOKIE['username'],$_COOKIE['TOKEN'],$_POST['CREATETIME'],$KEYWORD];
+         $returnData = SelectResult($sql,$ss,$arry);
+       }else{
+        //SQL語法
+        $sql = "SELECT *,
+                       date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                  FROM article
+                 WHERE POWER < (SELECT POWER
+                                  FROM member
+                                 WHERE USERNAME = ?
+                                   AND TOKEN =?)
+                   AND CONTENT LIKE ?
+                 ORDER BY CREATETIME DESC
+                 LIMIT 5";
+  
+         //解析回應資料    
+         $ss = "sss";
+         $arry = [$_COOKIE['username'],$_COOKIE['TOKEN'],$KEYWORD];
+         $returnData = SelectResult($sql,$ss,$arry);
+       }
+        
+        if(strlen($returnData)> 0){    
+          echo OutputResult("","1",$returnData);
+        }
+        else{
+          $arr = array('null' => "");
+          echo OutputResult("","1",$arr);
+        }
+    }else{
+      KeywordDefaultSearch($KEYWORD);
+    }
+    }else{
+      KeywordDefaultSearch($KEYWORD);
+    }
+    }
+    
+  function KeywordDefaultSearch($KEYWORD){
+    //loading使用
+    if (isset($_POST['CREATETIME'])){
+      //SQL語法
+      $sql = "SELECT *,
+                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                FROM article
+              WHERE POWER = 0
+                AND CREATETIME < ?
+                AND CONTENT LIKE ?
+               ORDER BY CREATETIME DESC
+              LIMIT 5";
+      //解析回應資料    
+       $ss = "ss";
+       $arry = [$_POST['CREATETIME'],$KEYWORD];
+       $returnData = SelectResult($sql,$ss,$arry);
+    }
+    else{
+      //SQL語法
+      $sql = "SELECT *,
+                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                FROM article
+              WHERE POWER = 0
+                AND 1 = ?
+                AND CONTENT LIKE ?
+               ORDER BY CREATETIME DESC
+              LIMIT 5";
+      //解析回應資料    
+       $ss = "ss";
+       $arry = [1,$KEYWORD];
+       $returnData = SelectResult($sql,$ss,$arry);
+    }
+    if(strlen($returnData)> 0){
+    echo OutputResult("","1",$returnData);
+    }
+    else{
+    $arr = array('null' => "");
+    echo OutputResult("","1",$arr);
+    }
+  }
+  //回傳分類 FOR VUE
+  function CATEGORYSResult(){
+    //SQL語法
+    $sql = "SELECT DISTINCT 
+                   CATEGORY
+              FROM article
+             WHERE 1 = ?";
+     //解析回應資料    
+     $returnData = SelectResult($sql,"s",[1]);
+    if(strlen($returnData)> 0){    
+      echo OutputResult("","1",$returnData);
+    }
+    else{
+      $arr = array('null' => "");
+      echo OutputResult("","1",$arr);
+    }
+  }
+  
+  //回傳刪除 FOR VUE
+  function DeleteResult($UUID){
+      if(check()){
+         //SQL語法
+         $sql = "DELETE 
+                   FROM article 
+                  WHERE UUID = ?";
+         $ss="s";
+         $params = [$UUID];
+         //解析回應資料     
+         if(CommandResult($sql,$ss,$params)){
+             $arr = array('null' => "");
+             echo OutputResult("","1",$arr);
+         }
+         else{
+           $arr = array('null' => "");
+           echo OutputResult("刪除失敗","0",$arr);
+         }
+      }
+      else{
+        $arr = array('null' => "");
+        echo OutputResult("沒有刪除的權限","0",$arr);
+      }
+  }
 
   function main(){
     $commandType = $_POST['commandType'];
     
     switch($commandType){
        case "login":
-        login($_POST['username'],$_POST['password']);
+        LoginResult($_POST['username'],$_POST['password']);
         break;
        case "check":
-        checkResult();
+        CheckResult();
         break;
-        case "post":
-         postResult($_POST['content'],$_POST['POWER']);
+       case "post":
+        PostResult($_POST['content'],$_POST['POWER'],$_POST['CATEGORY']);
+        break;
+       case "getAticle":
+         AticleResult($_POST['SEARCHTYPE'],$_POST['KEYWORD']);
          break;
-        case "getAticle":
-          AticleResult();
-          break;
+       case  "getCATEGORYS":
+         CATEGORYSResult();
+         break;
+       case  "delete":
+         DeleteResult($_POST['UUID']);
+         break;
     }
+  }
+
+  
+  //回傳檢查結果 FOR VUE
+  function AticleResult($SEARCHTYPE,$KEYWORD){
+    switch($SEARCHTYPE){
+      case "default":
+        DefaultResult();
+       break;
+      case "KEYWORD":
+        $KEYWORD = "%".$KEYWORD."%";
+        KeywordResult($KEYWORD);
+       break;
+   }
   }
   main();
 ?>

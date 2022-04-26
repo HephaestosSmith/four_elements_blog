@@ -1,6 +1,8 @@
 <template>
+  １
+  <!--
 <nav class="navbar bg-dark navbar-dark">
-  <!-- Links -->
+ Links
   <ul class="navbar-nav">
     <li class="nav-item">
       <a class="nav-link" href="#">Link 1</a>
@@ -12,5 +14,5 @@
       <a class="nav-link" href="#">Link 3</a>
     </li>
   </ul>
-</nav>
+</nav> -->
 </template>
