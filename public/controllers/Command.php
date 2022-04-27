@@ -378,7 +378,64 @@
         echo OutputResult("沒有刪除的權限","0",$arr);
       }
   }
-
+  
+  //回傳查詢文章 FOR VUE
+  function CONTENTResult($KEYWORD){
+    if(isset($_COOKIE['username'])) {
+      if(check()){
+        //SQL語法
+        $sql = "SELECT *,
+                       date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                  FROM article
+                 WHERE POWER < (SELECT POWER
+                                  FROM member
+                                 WHERE USERNAME = ?
+                                   AND TOKEN =?)
+                   AND UUID = ?";
+         //解析回應資料
+         $ss = "sss";
+         $arry = [$_COOKIE['username'],$_COOKIE['TOKEN'],$KEYWORD];
+         $returnData = SelectResult($sql,$ss,$arry);
+        
+        if(strlen($returnData)> 0){    
+          echo OutputResult("","1",$returnData);
+          return;
+        }
+     }
+    }
+    $arr = array('null' => "");
+    echo OutputResult("","1",$arr);
+  }
+  //發表
+  function UpdateResult($UUID,$MTDT){
+    if(check()){
+     $today = date('Y/m/d H:i:s');
+     
+     //SQL語法
+     $sql = "UPDATE article 
+                SET CONTENT = ?,
+                    POWER = ?,
+                    CATEGORY = ?,
+                    MTDT = ?
+              WHERE article.UUID = ?
+                AND MTDT = ?";
+     $ss="ssssss";
+     $params = [$_POST['CONTENT'], $_POST['POWER'], $_POST['CATEGORY'], $today , $UUID,$MTDT];
+     //解析回應資料     
+     if(CommandResult($sql,$ss,$params)){
+         $arr = array('null' => "");
+         echo OutputResult("","1",$arr);
+     }
+     else{
+       $arr = array('null' => "");
+       echo OutputResult("沒有修改權限","0",$arr);
+     }
+    }
+    else{
+      $arr = array('null' => "");
+      echo OutputResult("沒有修改權限","0",$arr);
+    }
+ }
   function main(){
     $commandType = $_POST['commandType'];
     
@@ -401,9 +458,11 @@
        case  "delete":
          DeleteResult($_POST['UUID']);
          break;
+       case  "update":
+         UpdateResult($_POST['UUID'],$_POST['MTDT']);
+         break;
     }
   }
-
   
   //回傳檢查結果 FOR VUE
   function AticleResult($SEARCHTYPE,$KEYWORD){
@@ -414,6 +473,9 @@
       case "KEYWORD":
         $KEYWORD = "%".$KEYWORD."%";
         KeywordResult($KEYWORD);
+       break;
+      case "CONTENT":
+        CONTENTResult($KEYWORD);
        break;
    }
   }

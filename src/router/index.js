@@ -5,6 +5,8 @@ import FooterView from '../views/FooterView.vue'
 import AboutView from '../views/AboutView.vue'
 import RightListView from '../views/RightListView.vue'
 import loginView from '../views/LoginView.vue'
+import EditedView from '../views/EditedView.vue'
+
 
 const routes = [
   {
@@ -36,18 +38,18 @@ const routes = [
       Footer:FooterView,
       RightList:RightListView
     },
-    meta:{ requiresAuth: true}
+    meta:{ loginAuth: true}
   },
   {
-    path: '/fixed',
-    name: 'fixed',
+    path: '/edited/:UUID',
+    name: 'edited',
     components: {
-      default: loginView,
+      default: EditedView,
       Header:HeaderView,
       Footer:FooterView,
       RightList:RightListView
     },
-    meta:{ requiresAuth: false}
+    meta:{ requiresAuth: true}
   }
 ]
 

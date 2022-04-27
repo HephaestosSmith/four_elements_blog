@@ -3,7 +3,7 @@
       <div class="col">
          <div class="row">
              <div class="col-sm-2" style="margin-top: 5px;">
-             <a class="btn btn-primary" @click="post()"  style="width:100px; height:35px;">發表</a>
+             <a class="btn btn-primary" @click="update()"  style="width:100px; height:35px;">修改</a>
              </div>
              <div class="col-sm-6" style="margin-top: 5px;">
                <div class="row">
@@ -32,37 +32,6 @@
              <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
              </div>
          </div>
-      </div>
-    </div>
-    <div v-for="(item,index) in this.useStore.state.list" :key="index" >
-      <div class="rounded text-wrap article text-white row">
-      <div class="col">
-           <div class="row">
-                <div class="col-9">
-                    <div class="row" v-if="loginstatus()">
-                      <router-link class="btn btn-info"  :to="{ name: 'edited', params: { UUID: item.UUID } }"  style="width:80px; height:35px; margin-left: 10px;">修改</router-link>
-                      <a class="btn btn-danger" @click="Delete(item.UUID)"  style="width:80px; height:35px; margin-left: 10px;">刪除</a>
-                    </div>
-                </div>
-                <div class="col-3 text-right">
-                   {{ item.CREATEDATE }}
-                </div>
-           </div>
-           <div style="height:8px;"/>
-           <div class="row">
-                <div class="col" v-html= item.CONTENT>
-                </div>
-           </div>
-           <hr>
-           <div class="row">
-              <div class="col-10 col-md-9">
-                    發文時間:{{ item.CREATETIME }}
-              </div>
-              <div class="col-md-3 text-right">
-                  作者: {{item.AUTHOR}}
-              </div>
-           </div>
-          </div>
       </div>
     </div>
     <div class="row">
@@ -104,6 +73,11 @@ import { useStore } from 'vuex'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 export default {
+  props: {
+    id: {
+      type: String,
+    },
+  },
   data() {
       return {
           POWER:'1',
@@ -112,15 +86,14 @@ export default {
           editorConfig: {
               // The configuration of the editor.
           },
-          loading:false,
+          loading:true,
           CATEGORY:'',
-          CATEGORYS:[]
+          CATEGORYS:[],
+          article:[]
       };
   },
   created(){
      this.useStore = useStore();
-     this.useStore.state.list = [];
-     this.loading = true;
      this.Logined();
   },
   methods:{
@@ -133,18 +106,12 @@ export default {
       Logined(){
       let me = this;
       let useStore = me.useStore;
-      let state = me.useStore.state;
       let http = useStore.state.axios;
       let phpurl = useStore.getters.phpurl;
       let data = new URLSearchParams();
 
-      state.SEARCHTYPE = 'default';
       data.append('commandType', "check");
 
-      if (!state.Createflag){
-        state.Createflag = true;
-        window.addEventListener('scroll', this.handleScroll, true);
-      }
       http.post(phpurl("Command"),data)
       .then(function(response){
        let success = response.data.success;
@@ -155,55 +122,38 @@ export default {
        else{
            useStore.state.logined = false;
        }
-       me.getAticle(false);
+       me.getAticle();
       })
       .catch(function (error) {
        alert(error);
       });
   },
-  getAticle(postflag/*檢查是否發文章*/){
+  getAticle(){
       let me = this;
       let useStore = me.useStore;
       let state = me.useStore.state;
       let http = state.axios;
       let phpurl = useStore.getters.phpurl;
+      let UUID = me.$route.params.UUID;
       
       let data = new URLSearchParams();
       data.append('commandType', "getAticle");
-      data.append('SEARCHTYPE', state.SEARCHTYPE);
-      data.append('KEYWORD', state.KEYWORD);
-
-      //取得新的文章
-      if(!postflag){
-          if(state.list.length > 0){
-              let nowData = state.list[state.list.length - 1];
-              let lastCreatedate = nowData["CREATETIME"];
-              data.append('CREATETIME', lastCreatedate);
-          }
-      }
+      data.append('SEARCHTYPE', 'CONTENT');
+      data.append('KEYWORD', UUID);
 
       http.post(phpurl("Command"),data)
       .then(function(response){
+       me.loading = false;
        let success = response.data.success;
        if (success == "1"){
-           me.loading = false;
-           let result = response.data.result;
-           if(postflag){
-               state.list = state.list.reverse();
-               state.list.push(result[0]); 
-               state.list = state.list.reverse();
-           } else{
-              result.forEach(element => {
-                  state.list.push(element);
-              });
-           }
-           if (result.length == 0){
-             state.noDataFlag = true;
-           }
+           let result = response.data.result[0];
+           me.article = result;
+           me.CATEGORY = me.article.CATEGORY;
+           me.POWER = me.article.POWER;
+           me.editorData = me.article.CONTENT;
        }
        else{
           let msg =response.data.msg;
-          me.loading = false;
           alert(msg);
        }
       })
@@ -213,27 +163,26 @@ export default {
       });
       
   },
-  post(){
+  update(){
       let me = this;
       let useStore = me.useStore;
       let http = useStore.state.axios;
       let phpurl = useStore.getters.phpurl;
       
       let data = new URLSearchParams();
-      data.append('commandType', "post");
-      data.append('content', me.editorData);
+      data.append('commandType', "update");
+      data.append('CONTENT', me.editorData);
       data.append('POWER',me.POWER);
       data.append('CATEGORY',me.CATEGORY);
-      
-
+      data.append('UUID',me.article.UUID);
+      data.append('MTDT',me.article.MTDT);
+      console.log(me.changechek());
+      if(me.changechek()){
       http.post(phpurl("Command"),data)
       .then(function(response){
        let success = response.data.success;
        if (success == "1"){
-           me.editorData = "";
-           me.getAticle(true);
-           me.getCATEGORYS();
-           me.CATEGORY = "";
+           me.$router.push("/");
        }
        else{
           let msg =response.data.msg;
@@ -243,15 +192,8 @@ export default {
       .catch(function (error) {
        alert(error);
       });
-  },
-  handleScroll(){
-      let me = this;
-      let state = me.useStore.state;
-      if (window.scrollY + document.documentElement.clientHeight >= document.body.scrollHeight - 5) {
-          if (!me.loading & !state.noDataFlag){
-              me.loading = true;
-              me.getAticle(false);
-          }
+      }else{
+        me.$router.push("/");
       }
   },
   getCATEGORYS(){
@@ -287,39 +229,18 @@ export default {
        alert(error);
       });
   },
-  Delete(UUID){
-      if(!confirm("是否刪除文章?")){
-        return;
-      }
-      
+  changechek(){
       let me = this;
-      let useStore = me.useStore;
-      let state = me.useStore.state;
-      let http = useStore.state.axios;
-      let phpurl = useStore.getters.phpurl;
-      
-      let data = new URLSearchParams();
-      data.append('commandType', "delete");
-      data.append('UUID', UUID);
-      
-      http.post(phpurl("Command"),data)
-      .then(function(response){
-       let success = response.data.success;
-       if (success == "1"){
-             let list = [];
-             list = state.list.filter(function(item) {
-                 return item.UUID !== UUID
-             });
-             state.list = list;
-       }
-       else{
-          let msg =response.data.msg;
-          alert(msg);
-       }
-      })
-      .catch(function (error) {
-       alert(error);
-      });
+      let oldData = me.article;
+      if(oldData.CONTENT != me.editorData){
+          return true;
+      }else if (oldData.POWER != me.POWER){
+          return true;
+      }else if (oldData.CATEGORY != me.CATEGORY){
+          return true;
+      }else{
+          return false;
+      }
   }
   }
 }

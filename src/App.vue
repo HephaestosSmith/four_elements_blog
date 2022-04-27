@@ -8,7 +8,7 @@
   <div class="row">
     <div class="d-none d-md-block col-md-2 bd-toc">
     </div>
-    <div class="col-md-8">
+    <div class="col-md-8 main">
        <router-view/>
     </div>
     <div class="d-none d-xl-block col-xl-2 bd-toc">
