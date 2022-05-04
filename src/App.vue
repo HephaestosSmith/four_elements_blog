@@ -80,4 +80,5 @@ img{
 }
 
 @import './css/ck.css';
+@import "./css/prism-tomorrow.css"; // you can change
 </style>
