@@ -2,10 +2,20 @@
     <div class="rounded text-wrap article row" v-if="loginstatus()">
       <div class="col">
          <div class="row">
-             <div class="col-sm-2" style="margin-top: 5px;">
-             <a class="btn btn-primary" @click="post()"  style="width:100px; height:35px;">發表</a>
+             <div class="col">
+             <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
              </div>
-             <div class="col-sm-6" style="margin-top: 5px;">
+         </div>
+        <div style="height:8px;"/>
+         <div class="row">
+             <div class="col-sm-2 text-white" style="margin-top: 5px;">
+               文章顯示:
+             <select class="form-select" v-model="POWER">
+               <option value="0">公開</option>
+               <option value="1" selected>不公開</option>
+             </select>
+             </div>
+             <div class="col-sm-8" style="margin-top: 5px;">
                <div class="row">
                   <div class="col-4" style="padding-right: 5px;padding-left: 10px;">
                      <select class="form-select"  v-model="CATEGORY" style="width: inherit;">
@@ -18,18 +28,9 @@
                   </div>
                </div>
              </div>
-             <div class="col-sm-4 text-white" style="margin-top: 5px;">
-               文章顯示:
-             <select class="form-select" v-model="POWER">
-               <option value="0">公開</option>
-               <option value="1" selected>不公開</option>
-             </select>
-             </div>
-         </div>
-        <div style="height:8px;"/>
-         <div class="row">
-             <div class="col">
-             <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
+             <div class="col-sm-2" style="margin-top: 5px;">
+             <a class="btn btn-primary" @click="PrismView()"  style="height:35px; margin-right: 5px;">預覽</a>
+             <a class="btn btn-primary" @click="post()"  style="height:35px;">發表</a>
              </div>
          </div>
       </div>
@@ -38,27 +39,31 @@
       <div class="rounded text-wrap article text-white row">
       <div class="col">
            <div class="row">
-                <div class="col-9">
-                    <div class="row" v-if="loginstatus()">
-                      <router-link class="btn btn-info"  :to="{ name: 'edited', params: { UUID: item.UUID } }"  style="width:80px; height:35px; margin-left: 10px;">修改</router-link>
-                      <a class="btn btn-danger" @click="Delete(item.UUID)"  style="width:80px; height:35px; margin-left: 10px;">刪除</a>
-                    </div>
+                <div class="col-6">
+                  {{ item.CREATEDATE }}
                 </div>
-                <div class="col-3 text-right">
-                   {{ item.CREATEDATE }}
+                <div class="col-6 text-right">
+                   <a class="dropdown"  v-if="loginstatus()">
+                     <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" style="height: 35px;">
+                     </a>
+                     <div class="dropdown-menu">
+                       <router-link class="dropdown-item btn"  :to="{ name: 'edited', params: { UUID: item.UUID } }">編輯</router-link>
+                       <button class="dropdown-item btn" @click="Delete(item.UUID)">刪除</button>
+                     </div>
+                  </a>
                 </div>
            </div>
            <div style="height:8px;"/>
            <div class="row">
-                <div class="col" v-html= item.CONTENT>
+                <div class="col ck-content" v-html= item.CONTENT>
                 </div>
            </div>
            <hr>
            <div class="row">
-              <div class="col-10 col-md-9">
+              <div class="col-7">
                     發文時間:{{ item.CREATETIME }}
               </div>
-              <div class="col-md-3 text-right">
+              <div class="col-5 text-right">
                   作者: {{item.AUTHOR}}
               </div>
            </div>
@@ -101,27 +106,50 @@
 </template>
 <script>
 import { useStore } from 'vuex'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import Prism from "prismjs";
+import 'prismjs/components/prism-bash'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-json'
+import 'prismjs/components/prism-liquid'
+import 'prismjs/components/prism-markdown'
+import 'prismjs/components/prism-markup-templating'
+import 'prismjs/components/prism-php'
+import 'prismjs/components/prism-scss'
+import "prismjs/themes/prism-tomorrow.css"; // you can change
+
 
 export default {
+  inject: [
+     'conection'
+     ],
   data() {
       return {
           POWER:'1',
-          editor: ClassicEditor,
+          editor: '',
           editorData: '',
-          editorConfig: {
-              // The configuration of the editor.
-          },
-          loading:false,
+          editorConfig: '' ,
+          loading:true,
           CATEGORY:'',
-          CATEGORYS:[]
+          CATEGORYS:[],
+          listcount:0
       };
   },
+  updated(){
+    let me = this;
+    let list = me.useStore.state.list.length;
+    if (me.listcount != list){
+      me.listcount =list;
+      me.PrismView();
+    }
+  },
   created(){
-     this.useStore = useStore();
-     this.useStore.state.list = [];
-     this.loading = true;
-     this.Logined();
+     let me = this;
+     me.useStore = useStore();
+     me.useStore.state.list = [];
+     me.loading = true;
+     me.editor = me.useStore.state.CKEditor;
+     me.editorConfig = me.useStore.state.editorConfig;
+     me.Logined();
   },
   methods:{
       loginstatus(){
@@ -132,41 +160,32 @@ export default {
       },
       Logined(){
       let me = this;
-      let useStore = me.useStore;
       let state = me.useStore.state;
-      let http = useStore.state.axios;
-      let phpurl = useStore.getters.phpurl;
-      let data = new URLSearchParams();
-
-      state.SEARCHTYPE = 'default';
-      data.append('commandType', "check");
 
       if (!state.Createflag){
         state.Createflag = true;
         window.addEventListener('scroll', this.handleScroll, true);
       }
-      http.post(phpurl("Command"),data)
-      .then(function(response){
+
+      let data = new URLSearchParams();
+      data.append('commandType', "check");
+      state.SEARCHTYPE = 'default';
+
+      me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
-           useStore.state.logined = true;
+           state.logined = true;
            me.getCATEGORYS();
        }
        else{
-           useStore.state.logined = false;
+           state.logined = false;
        }
        me.getAticle(false);
-      })
-      .catch(function (error) {
-       alert(error);
       });
   },
   getAticle(postflag/*檢查是否發文章*/){
       let me = this;
-      let useStore = me.useStore;
       let state = me.useStore.state;
-      let http = state.axios;
-      let phpurl = useStore.getters.phpurl;
       
       let data = new URLSearchParams();
       data.append('commandType', "getAticle");
@@ -181,9 +200,8 @@ export default {
               data.append('CREATETIME', lastCreatedate);
           }
       }
-
-      http.post(phpurl("Command"),data)
-      .then(function(response){
+      
+      me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
            me.loading = false;
@@ -206,18 +224,10 @@ export default {
           me.loading = false;
           alert(msg);
        }
-      })
-      .catch(function (error) {
-       me.loading = false;
-       alert(error);
       });
-      
   },
   post(){
       let me = this;
-      let useStore = me.useStore;
-      let http = useStore.state.axios;
-      let phpurl = useStore.getters.phpurl;
       
       let data = new URLSearchParams();
       data.append('commandType', "post");
@@ -225,9 +235,7 @@ export default {
       data.append('POWER',me.POWER);
       data.append('CATEGORY',me.CATEGORY);
       
-
-      http.post(phpurl("Command"),data)
-      .then(function(response){
+      me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
            me.editorData = "";
@@ -239,9 +247,6 @@ export default {
           let msg =response.data.msg;
           alert(msg);
        }
-      })
-      .catch(function (error) {
-       alert(error);
       });
   },
   handleScroll(){
@@ -254,17 +259,15 @@ export default {
           }
       }
   },
+  PrismView(){
+      Prism.highlightAll(); 
+  },
   getCATEGORYS(){
       let me = this;
-      let useStore = me.useStore;
-      let http = useStore.state.axios;
-      let phpurl = useStore.getters.phpurl;
-      
       let data = new URLSearchParams();
       data.append('commandType', "getCATEGORYS");
-
-      http.post(phpurl("Command"),data)
-      .then(function(response){
+      
+      me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
            let result = response.data.result;
@@ -282,28 +285,19 @@ export default {
           alert(msg);
        }
       })
-      .catch(function (error) {
-       me.loading = false;
-       alert(error);
-      });
   },
   Delete(UUID){
       if(!confirm("是否刪除文章?")){
         return;
       }
-      
       let me = this;
-      let useStore = me.useStore;
       let state = me.useStore.state;
-      let http = useStore.state.axios;
-      let phpurl = useStore.getters.phpurl;
       
       let data = new URLSearchParams();
       data.append('commandType', "delete");
       data.append('UUID', UUID);
       
-      http.post(phpurl("Command"),data)
-      .then(function(response){
+      me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
              let list = [];
@@ -317,9 +311,6 @@ export default {
           alert(msg);
        }
       })
-      .catch(function (error) {
-       alert(error);
-      });
   }
   }
 }

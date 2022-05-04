@@ -2,8 +2,15 @@
     <div class="rounded text-wrap article row" v-if="loginstatus()">
       <div class="col">
          <div class="row">
+             <div class="col">
+             <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
+             </div>
+         </div>
+        <div style="height:8px;"/>
+         <div class="row">
              <div class="col-sm-2" style="margin-top: 5px;">
-             <a class="btn btn-primary" @click="update()"  style="width:100px; height:35px;">修改</a>
+             <a class="btn btn-primary" @click="update()"  style="height:35px; margin-right: 5px;">修改</a>
+             <a class="btn btn-primary" @click="PrismView()"  style="height:35px;">預覽</a>
              </div>
              <div class="col-sm-6" style="margin-top: 5px;">
                <div class="row">
@@ -24,12 +31,6 @@
                <option value="0">公開</option>
                <option value="1" selected>不公開</option>
              </select>
-             </div>
-         </div>
-        <div style="height:8px;"/>
-         <div class="row">
-             <div class="col">
-             <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
              </div>
          </div>
       </div>
@@ -70,9 +71,21 @@
 </template>
 <script>
 import { useStore } from 'vuex'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import Prism from "prismjs";
+import 'prismjs/components/prism-bash'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-json'
+import 'prismjs/components/prism-liquid'
+import 'prismjs/components/prism-markdown'
+import 'prismjs/components/prism-markup-templating'
+import 'prismjs/components/prism-php'
+import 'prismjs/components/prism-scss'
+import "prismjs/themes/prism-tomorrow.css"; // you can change
 
 export default {
+  inject: [
+     'conection'
+     ],
   props: {
     id: {
       type: String,
@@ -81,11 +94,9 @@ export default {
   data() {
       return {
           POWER:'1',
-          editor: ClassicEditor,
+          editor: '',
           editorData: '',
-          editorConfig: {
-              // The configuration of the editor.
-          },
+          editorConfig: '',
           loading:true,
           CATEGORY:'',
           CATEGORYS:[],
@@ -93,7 +104,10 @@ export default {
       };
   },
   created(){
-     this.useStore = useStore();
+     let me = this;
+     me.useStore = useStore();
+     me.editor = me.useStore.state.CKEditor;
+     me.editorConfig = me.useStore.state.editorConfig;
      this.Logined();
   },
   methods:{
@@ -105,44 +119,32 @@ export default {
       },
       Logined(){
       let me = this;
-      let useStore = me.useStore;
-      let http = useStore.state.axios;
-      let phpurl = useStore.getters.phpurl;
+      let state = me.useStore.state;
       let data = new URLSearchParams();
-
       data.append('commandType', "check");
-
-      http.post(phpurl("Command"),data)
-      .then(function(response){
+      
+      me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
-           useStore.state.logined = true;
+           state.logined = true;
            me.getCATEGORYS();
        }
        else{
-           useStore.state.logined = false;
+           state.logined = false;
        }
        me.getAticle();
-      })
-      .catch(function (error) {
-       alert(error);
       });
   },
   getAticle(){
       let me = this;
-      let useStore = me.useStore;
-      let state = me.useStore.state;
-      let http = state.axios;
-      let phpurl = useStore.getters.phpurl;
       let UUID = me.$route.params.UUID;
       
       let data = new URLSearchParams();
       data.append('commandType', "getAticle");
       data.append('SEARCHTYPE', 'CONTENT');
       data.append('KEYWORD', UUID);
-
-      http.post(phpurl("Command"),data)
-      .then(function(response){
+      
+      me.conection(data,function(response){
        me.loading = false;
        let success = response.data.success;
        if (success == "1"){
@@ -156,18 +158,10 @@ export default {
           let msg =response.data.msg;
           alert(msg);
        }
-      })
-      .catch(function (error) {
-       me.loading = false;
-       alert(error);
       });
-      
   },
   update(){
       let me = this;
-      let useStore = me.useStore;
-      let http = useStore.state.axios;
-      let phpurl = useStore.getters.phpurl;
       
       let data = new URLSearchParams();
       data.append('commandType', "update");
@@ -176,37 +170,28 @@ export default {
       data.append('CATEGORY',me.CATEGORY);
       data.append('UUID',me.article.UUID);
       data.append('MTDT',me.article.MTDT);
-      console.log(me.changechek());
-      if(me.changechek()){
-      http.post(phpurl("Command"),data)
-      .then(function(response){
-       let success = response.data.success;
-       if (success == "1"){
-           me.$router.push("/");
-       }
-       else{
-          let msg =response.data.msg;
-          alert(msg);
-       }
-      })
-      .catch(function (error) {
-       alert(error);
-      });
+      
+      if(me.changecheck()){
+         me.conection(data,function(response){
+          let success = response.data.success;
+          if (success == "1"){
+              me.$router.push("/");
+          }
+          else{
+             let msg =response.data.msg;
+             alert(msg);
+          }
+         });
       }else{
         me.$router.push("/");
       }
   },
   getCATEGORYS(){
       let me = this;
-      let useStore = me.useStore;
-      let http = useStore.state.axios;
-      let phpurl = useStore.getters.phpurl;
-      
       let data = new URLSearchParams();
       data.append('commandType', "getCATEGORYS");
-
-      http.post(phpurl("Command"),data)
-      .then(function(response){
+      
+      me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
            let result = response.data.result;
@@ -223,13 +208,9 @@ export default {
           me.loading = false;
           alert(msg);
        }
-      })
-      .catch(function (error) {
-       me.loading = false;
-       alert(error);
       });
   },
-  changechek(){
+  changecheck(){
       let me = this;
       let oldData = me.article;
       if(oldData.CONTENT != me.editorData){
@@ -241,6 +222,9 @@ export default {
       }else{
           return false;
       }
+  },  
+  PrismView(){
+      Prism.highlightAll(); 
   }
   }
 }

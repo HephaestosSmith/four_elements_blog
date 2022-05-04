@@ -1,6 +1,49 @@
 <?php
   include 'ReturnResult.php';
+  main();
+  function main(){
+    $commandType = $_POST['commandType'];
+    
+    switch($commandType){
+       case "login":
+        LoginResult($_POST['username'],$_POST['password']);
+        break;
+       case "check":
+        CheckResult();
+        break;
+       case "post":
+        PostResult($_POST['content'],$_POST['POWER'],$_POST['CATEGORY']);
+        break;
+       case "getAticle":
+         AticleResult($_POST['SEARCHTYPE'],$_POST['KEYWORD']);
+         break;
+       case  "getCATEGORYS":
+         CATEGORYSResult();
+         break;
+       case  "delete":
+         DeleteResult($_POST['UUID']);
+         break;
+       case  "update":
+         UpdateResult($_POST['UUID'],$_POST['MTDT']);
+         break;
+    }
+  }
   
+  //回傳檢查結果 FOR VUE
+  function AticleResult($SEARCHTYPE,$KEYWORD){
+    switch($SEARCHTYPE){
+      case "default":
+        DefaultResult();
+       break;
+      case "KEYWORD":
+        $KEYWORD = "%".$KEYWORD."%";
+        KeywordResult($KEYWORD);
+       break;
+      case "CONTENT":
+        CONTENTResult($KEYWORD);
+       break;
+   }
+  }
   function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
   {
   switch ($theType) {
@@ -157,7 +200,7 @@
      if (isset($_POST['CREATETIME'])){
       //SQL語法
       $sql = "SELECT *,
-                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                     date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
                 FROM article
                WHERE POWER < (SELECT POWER
                                 FROM member
@@ -173,7 +216,7 @@
      }else{
       //SQL語法
       $sql = "SELECT *,
-                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                     date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
                 FROM article
                WHERE POWER < (SELECT POWER
                                 FROM member
@@ -207,7 +250,7 @@
     if (isset($_POST['CREATETIME'])){
       //SQL語法
       $sql = "SELECT *,
-                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                     date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
                 FROM article
               WHERE POWER = 0
                 AND CREATETIME < ?
@@ -221,7 +264,7 @@
     else{
       //SQL語法
       $sql = "SELECT *,
-                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                     date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
                 FROM article
               WHERE POWER = 0
                 AND 1 = ?
@@ -248,7 +291,7 @@
        if (isset($_POST['CREATETIME'])){
         //SQL語法
         $sql = "SELECT *,
-                       date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                       date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
                   FROM article
                  WHERE POWER < (SELECT POWER
                                   FROM member
@@ -265,7 +308,7 @@
        }else{
         //SQL語法
         $sql = "SELECT *,
-                       date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                       date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
                   FROM article
                  WHERE POWER < (SELECT POWER
                                   FROM member
@@ -295,13 +338,12 @@
       KeywordDefaultSearch($KEYWORD);
     }
     }
-    
   function KeywordDefaultSearch($KEYWORD){
     //loading使用
     if (isset($_POST['CREATETIME'])){
       //SQL語法
       $sql = "SELECT *,
-                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                     date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
                 FROM article
               WHERE POWER = 0
                 AND CREATETIME < ?
@@ -316,7 +358,7 @@
     else{
       //SQL語法
       $sql = "SELECT *,
-                     date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                     date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
                 FROM article
               WHERE POWER = 0
                 AND 1 = ?
@@ -385,7 +427,7 @@
       if(check()){
         //SQL語法
         $sql = "SELECT *,
-                       date_format( CREATETIME,'%Y年%m月%d日') AS CREATEDATE
+                       date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
                   FROM article
                  WHERE POWER < (SELECT POWER
                                   FROM member
@@ -436,48 +478,4 @@
       echo OutputResult("沒有修改權限","0",$arr);
     }
  }
-  function main(){
-    $commandType = $_POST['commandType'];
-    
-    switch($commandType){
-       case "login":
-        LoginResult($_POST['username'],$_POST['password']);
-        break;
-       case "check":
-        CheckResult();
-        break;
-       case "post":
-        PostResult($_POST['content'],$_POST['POWER'],$_POST['CATEGORY']);
-        break;
-       case "getAticle":
-         AticleResult($_POST['SEARCHTYPE'],$_POST['KEYWORD']);
-         break;
-       case  "getCATEGORYS":
-         CATEGORYSResult();
-         break;
-       case  "delete":
-         DeleteResult($_POST['UUID']);
-         break;
-       case  "update":
-         UpdateResult($_POST['UUID'],$_POST['MTDT']);
-         break;
-    }
-  }
-  
-  //回傳檢查結果 FOR VUE
-  function AticleResult($SEARCHTYPE,$KEYWORD){
-    switch($SEARCHTYPE){
-      case "default":
-        DefaultResult();
-       break;
-      case "KEYWORD":
-        $KEYWORD = "%".$KEYWORD."%";
-        KeywordResult($KEYWORD);
-       break;
-      case "CONTENT":
-        CONTENTResult($KEYWORD);
-       break;
-   }
-  }
-  main();
 ?>

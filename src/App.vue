@@ -21,10 +21,13 @@
 </div>
 </template>
 <script>
+import { useStore } from 'vuex'
+
 export default {
   provide(){    
     return {
-      reload: this.reload      
+      reload: this.reload,      
+      conection: this.conection    
     }
   },
   data() {
@@ -35,11 +38,24 @@ export default {
   created() {
     //document.title = "四元素部落格";
     document.getElementsByTagName("body")[0].className="bg-secondary";
+    this.useStore = useStore();
   },
   methods: {
     reload () {
       this.isRouterAlive = false;
       this.$nextTick( ()=> { this.isRouterAlive=true } ) ;
+    },
+    conection (data,response) {
+      let me = this;
+      let useStore = me.useStore;
+      let http = useStore.state.axios;
+      let phpurl = useStore.getters.phpurl;
+
+      http.post(phpurl("Command"),data)
+      .then(response)
+      .catch(function (error) {
+       alert(error);
+      });
     }
   }
 }
@@ -58,4 +74,10 @@ export default {
 .ck-editor__editable {
     min-height: 300px;
 }
+img{
+  max-height: 100%;
+  max-width: 100%;
+}
+
+@import './css/ck.css';
 </style>
