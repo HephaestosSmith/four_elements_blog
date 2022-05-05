@@ -36,21 +36,23 @@
       </div>
     </div>
     <div v-for="(item,index) in this.useStore.state.list" :key="index" >
-      <div class="rounded text-wrap article text-white row">
+    <router-link style="text-decoration:none;" class="rounded text-wrap article text-white row" :to="{ name: 'article', params: { UUID: item.UUID } }" :key="item.UUID" data-toggle="modal" data-target="#ModalView">
+      <!--<div class="rounded text-wrap article text-white row">-->
       <div class="col">
            <div class="row">
                 <div class="col-6">
-                  {{ item.CREATEDATE }}
+                   {{ item.CREATEDATE }}
+                    <!--<router-link class="rounded text-wrap article text-white row" :to="{ name: 'article', params: { UUID: item.UUID } }" :key="item.UUID" data-toggle="modal" data-target="#ModalView">登入</router-link>-->
                 </div>
                 <div class="col-6 text-right">
-                   <a class="dropdown"  v-if="loginstatus()">
+                   <!--<a class="dropdown"  v-if="loginstatus()">
                      <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" style="height: 35px;">
                      </a>
                      <div class="dropdown-menu">
-                       <router-link class="dropdown-item btn"  :to="{ name: 'edited', params: { UUID: item.UUID } }">編輯</router-link>
+                       <router-link class="dropdown-item btn"  :to="{ name: 'edited', params: { UUID: item.UUID } }" data-toggle="modal" data-target="#ModalView">編輯</router-link>
                        <button class="dropdown-item btn" @click="Delete(item.UUID)">刪除</button>
                      </div>
-                  </a>
+                  </a>-->
                 </div>
            </div>
            <div style="height:8px;"/>
@@ -68,7 +70,7 @@
               </div>
            </div>
           </div>
-      </div>
+      </router-link><!--</div>-->
     </div>
     <div class="row">
       <div class="col">
@@ -76,29 +78,26 @@
       </div>
     </div>
     <div class="row" v-if="loading">
-      <div class="col">
-        <div class="spinner-grow text-primary" role="status">
+      <div class="col d-flex justify-content-center">
+        <div class="spinner-grow text-primary m-5" role="status">
           <span class="sr-only">Loading...</span>
         </div>
-        <div class="spinner-grow text-secondary" role="status">
+        <div class="spinner-grow text-success m-5" role="status">
           <span class="sr-only">Loading...</span>
         </div>
-        <div class="spinner-grow text-success" role="status">
+        <div class="spinner-grow text-danger m-5" role="status">
           <span class="sr-only">Loading...</span>
         </div>
-        <div class="spinner-grow text-danger" role="status">
+        <div class="spinner-grow text-warning m-5" role="status">
           <span class="sr-only">Loading...</span>
         </div>
-        <div class="spinner-grow text-warning" role="status">
+        <div class="spinner-grow text-info m-5" role="status">
           <span class="sr-only">Loading...</span>
         </div>
-        <div class="spinner-grow text-info" role="status">
+        <div class="spinner-grow text-light m-5" role="status">
           <span class="sr-only">Loading...</span>
         </div>
-        <div class="spinner-grow text-light" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-dark" role="status">
+        <div class="spinner-grow text-dark m-5" role="status">
           <span class="sr-only">Loading...</span>
         </div>
       </div>
@@ -115,7 +114,6 @@ import 'prismjs/components/prism-markdown'
 import 'prismjs/components/prism-markup-templating'
 import 'prismjs/components/prism-php'
 import 'prismjs/components/prism-scss'
-import "prismjs/themes/prism-tomorrow.css"; // you can change
 
 
 export default {

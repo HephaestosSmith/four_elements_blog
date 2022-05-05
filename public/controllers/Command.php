@@ -11,6 +11,9 @@
        case "check":
         CheckResult();
         break;
+       case "checkPOWER":
+        CheckPOWERResult();
+        break;
        case "post":
         PostResult($_POST['content'],$_POST['POWER'],$_POST['CATEGORY']);
         break;
@@ -158,9 +161,9 @@
   //發表
   function PostResult($content,$POWER,$CATEGORY){
      if(check()){
-      $today = date('Y/m/d H:i:s');
+      $uniqid = uniqid();
       
-      $UUID = mb_substr( strip_tags($content) , 0 , 10,'UTF-8')."_".$today;
+      $UUID = mb_substr( strip_tags($content) , 0 , 10,'UTF-8')."_".$uniqid;
       //SQL語法
       $sql = "INSERT INTO article 
                          (`UUID`,
@@ -444,6 +447,21 @@
           return;
         }
      }
+    }else{
+        //SQL語法
+        $sql = "SELECT *,
+                       date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
+                  FROM article
+                 WHERE POWER = 0
+                   AND UUID = ?";
+         //解析回應資料
+         $ss = "s";
+         $arry = [$KEYWORD];
+         $returnData = SelectResult($sql,$ss,$arry);
+        if(strlen($returnData)> 0){    
+          echo OutputResult("","1",$returnData);
+          return;
+        }
     }
     $arr = array('null' => "");
     echo OutputResult("","1",$arr);
@@ -478,4 +496,60 @@
       echo OutputResult("沒有修改權限","0",$arr);
     }
  }
+  //回傳檢查結果 FOR VUE
+  function CheckPOWERResult(){
+    if(isset($_COOKIE['username'])) {
+    //SQL語法
+    $sql = "SELECT *
+              FROM member
+             WHERE USERNAME = ?
+               AND TOKEN = ?"; 
+     $ss = 'ss';
+     $params = [$_COOKIE['username'],$_COOKIE['TOKEN']];
+     //解析回應資料    
+     $returnData = json_decode(SelectResult($sql,$ss,$params), true);
+     if(count($returnData)> 0){
+         $sql = "SELECT *
+                   FROM article
+                  WHERE POWER < (SELECT POWER
+                                   FROM member
+                                  WHERE USERNAME = ?
+                                    AND TOKEN =?)
+                    AND UUID = ?";
+   
+         $ss = 'sss';
+         $params = [$_COOKIE['username'],$_COOKIE['TOKEN'],$_POST['UUID']];
+         //解析回應資料    
+         $returnData = json_decode(SelectResult($sql,$ss,$params), true);
+         if(count($returnData)> 0){
+           $arr = array('null' => "");
+           echo OutputResult("","1",$arr);
+         }else{
+           $arr = array('null' => "");
+           echo OutputResult("權限不足","0",$arr);
+         }
+     }
+     else{
+     $arr = array('null' => "");
+     echo OutputResult("查無使用者","0",$arr);
+     }
+    }else{
+      //SQL語法
+      $sql = "SELECT *
+                FROM article
+               WHERE POWER = 0
+                AND UUID = ?"; 
+      $ss = 's';
+      $params = [$_POST['UUID']];
+      //解析回應資料    
+      $returnData = json_decode(SelectResult($sql,$ss,$params), true);
+      if(count($returnData)> 0){
+        $arr = array('null' => "");
+        echo OutputResult("","1",$arr);
+      }else{
+        $arr = array('null' => "");
+        echo OutputResult("查無使用者","0",$arr);
+      }
+    }
+    }
 ?>

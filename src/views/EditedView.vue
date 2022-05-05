@@ -84,7 +84,8 @@ import "prismjs/themes/prism-tomorrow.css"; // you can change
 
 export default {
   inject: [
-     'conection'
+     'conection',
+     'modalshow'
      ],
   props: {
     id: {
@@ -153,6 +154,7 @@ export default {
            me.CATEGORY = me.article.CATEGORY;
            me.POWER = me.article.POWER;
            me.editorData = me.article.CONTENT;
+           me.modalshow();
        }
        else{
           let msg =response.data.msg;

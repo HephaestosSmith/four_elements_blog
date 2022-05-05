@@ -6,6 +6,8 @@ import AboutView from '../views/AboutView.vue'
 import RightListView from '../views/RightListView.vue'
 import loginView from '../views/LoginView.vue'
 import EditedView from '../views/EditedView.vue'
+import ArticleView from '../views/ArticleView.vue'
+
 
 
 const routes = [
@@ -33,10 +35,11 @@ const routes = [
     path: '/login',
     name: 'login',
     components: {
-      default: loginView,
+      default: HomeView,
       Header:HeaderView,
       Footer:FooterView,
-      RightList:RightListView
+      RightList:RightListView,
+      modal:loginView
     },
     meta:{ loginAuth: true}
   },
@@ -44,10 +47,23 @@ const routes = [
     path: '/edited/:UUID',
     name: 'edited',
     components: {
-      default: EditedView,
+      default:HomeView,
       Header:HeaderView,
       Footer:FooterView,
-      RightList:RightListView
+      RightList:RightListView,
+      modal:EditedView
+    },
+    meta:{ requiresAuth: true}
+  },
+  {
+    path: '/article/:UUID',
+    name: 'article',
+    components: {
+      default:HomeView,
+      Header:HeaderView,
+      Footer:FooterView,
+      RightList:RightListView,
+      modal:ArticleView
     },
     meta:{ requiresAuth: true}
   }

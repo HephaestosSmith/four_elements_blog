@@ -1,5 +1,5 @@
 <template>
-<div class="container-fluid" id="main"  v-if="isRouterAlive">
+<div class="container-fluid" id="main"  :key="display">
   <div class="row bg-dark sticky-top"  id="Header">
     <div class="col-12">
      <router-view name="Header"/>
@@ -14,36 +14,57 @@
     <div class="d-none d-xl-block col-xl-2 bd-toc">
        <router-view name="RightList" />
     </div>
+    
+<!-- The Modal -->
+<div class="modal fade" id="ModalView">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content bg-secondary">
+      <!-- Modal Header -->
+      <div class="col-sm-12">
+        <button type="button" class="close" data-dismiss="modal">X</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body modal-body-scrollable">
+       <router-view name="modal"/>
+      </div>
+
+      <!-- Modal footer
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" @click="close()" >Close</button>
+      </div> -->
+
+    </div>
   </div>
-  <!--<div class="row"  id="Footer">
-      <router-view name="Footer"/>
-  </div>-->
+</div>
+  </div>
+  
 </div>
 </template>
 <script>
 import { useStore } from 'vuex'
+import { Modal } from "bootstrap"
 
 export default {
   provide(){    
     return {
       reload: this.reload,      
-      conection: this.conection    
+      conection: this.conection,
+      modalshow:this.modalshow
     }
   },
   data() {
     return {
-      isRouterAlive: true,
+      display: 0
      }
   },
   created() {
-    //document.title = "四元素部落格";
-    document.getElementsByTagName("body")[0].className="bg-secondary";
-    this.useStore = useStore();
+     document.getElementsByTagName("body")[0].className="bg-secondary";
+     this.useStore = useStore();
   },
   methods: {
     reload () {
-      this.isRouterAlive = false;
-      this.$nextTick( ()=> { this.isRouterAlive=true } ) ;
+      this.display++;
     },
     conection (data,response) {
       let me = this;
@@ -56,6 +77,12 @@ export default {
       .catch(function (error) {
        alert(error);
       });
+    },
+    modalshow(){
+      let ModalView = new Modal(document.getElementById("ModalView"))
+      if(document.getElementsByClassName("show").length == 0){
+         ModalView.show();
+      }
     }
   }
 }

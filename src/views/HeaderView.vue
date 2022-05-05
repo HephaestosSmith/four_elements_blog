@@ -18,7 +18,7 @@
       <router-link class="nav-link" to="/" @click="home()">首頁</router-link>
     </li>
     <li class="nav-item" v-if="!loginstatus()">
-      <router-link class="nav-link" to="/login">登入</router-link>
+      <router-link class="nav-link" to="/login"  data-toggle="modal" data-target="#ModalView">登入</router-link>
     </li>
     <li class="nav-item" v-if="loginstatus()">
       <router-link class="nav-link"  to="/" @click="logout()">登出</router-link>
@@ -89,7 +89,8 @@ export default {
       state.list = [];
       state.logined = false;
       state.noDataFlag = false;
-      me.reload();
+      me.Logined();
+      me.HeaderSearch();
   },
   home(){
       let me = this;
@@ -97,6 +98,8 @@ export default {
       state.list = [];
       state.logined = false;
       state.noDataFlag = false;
+      me.Logined();
+      me.HeaderSearch();
   },
   HeaderSearch(flag){
       let me = this;
