@@ -12,8 +12,36 @@ axios.defaults.baseURL='/api'
 
 const app = createApp(App)
 
+router.install
+
 router.beforeEach((to, from, next) => {
-    if (to.meta.loginAuth) {  // 若要前往的頁面具有requiresAuth的話，就不會放行
+    if (to.meta.installedAuth) {  // 若要前往的頁面具有installedAuth的話，就不會放行
+        let data = new URLSearchParams();
+        data.append('name',to.name);
+        data.append('param',JSON.stringify(to.params));
+        axios.post('/controllers/install.php',data).then((response) => {
+          if (response.data.success == "1") {  // 若成功安裝→放行
+            next();
+            let title = response.data.result.title;
+            document.title = title;
+          }
+          else{
+            next({path: '/install'});
+          }
+        });
+      }else if (to.meta.installAuth) {  // 若要前往的頁面具有installedAuth的話，就不會放行
+        let data = new URLSearchParams();
+        data.append('name',to.name);
+        data.append('param',JSON.stringify(to.params));
+        axios.post('/controllers/install.php',data).then((response) => {
+          if (response.data.success == "1") {  // 若成功安裝→放行
+            next({path: '/'});
+          }
+          else{
+            next();                            // 若前往安裝頁面→放行
+          }
+        });
+      }else if (to.meta.loginAuth) {  // 若要前往的頁面具有requiresAuth的話，就不會放行
         let data = new URLSearchParams();
         data.append('commandType', "check");
         data.append('username', Cookies.get('username'));

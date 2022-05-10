@@ -39,10 +39,6 @@ function SelectResult($sql,$ss,$param){
       return json_encode($data);
   }
   catch(Exception $e) {
-    if($ss != ""){
-    //$stmt->close();
-    }
-    $conn->close();
     $msg = 'Message:'.$e->getMessage();
     return json_encode($msg);
   }
@@ -60,8 +56,6 @@ function CommandResult($sql,$ss,$param){
       return true;
   }
   catch(Exception $e) {
-    $stmt->close();
-    $conn->close();
     $msg = 'Message:'.$e->getMessage();
     echo json_encode($msg);
     return false;
@@ -90,5 +84,25 @@ function Tojson($inputData){
       return urldecode(json_encode($inputData)); 
   }else
     return $inputData;
+}
+
+
+//參考ReturnResult
+function InstallCommandResult($conn,$sql,$ss,$param){
+  try {
+      $stmt = $conn->prepare($sql);
+      if(strlen($ss)>0){
+          $stmt->bind_param($ss,...$param);
+      }
+      $stmt->execute();
+      $stmt->close();
+      $conn->close();
+      return true;
+  }
+  catch(Exception $e) {
+    $arr = array('null' => "");
+    echo OutputResult("建立資料庫失敗:".$e->getMessage(),"0",$arr);
+    return false;
+  }
 }
 ?>

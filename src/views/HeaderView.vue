@@ -6,7 +6,7 @@
   </div>-->
 <nav class="navbar navbar-expand-lg bg-dark navbar-dark" role="navigation">
   <!-- Brand -->
-  <router-link class="navbar-brand" to="/" @click="home()">四元素部落格</router-link>
+  <router-link class="navbar-brand" to="/" @click="home()">{{HomeName}}</router-link>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -15,12 +15,12 @@
   <!-- Links -->
   <ul class="navbar-nav mr-auto">
     <li class="nav-item">
-      <router-link class="nav-link" to="/" @click="home()">首頁</router-link>
+      <router-link class="nav-link" to="/" @click="home()" v-if="installflag">首頁</router-link>
     </li>
-    <li class="nav-item" v-if="!loginstatus()">
+    <li class="nav-item" v-if="!loginstatus() && installflag">
       <router-link class="nav-link" to="/login"  data-toggle="modal" data-target="#ModalView">登入</router-link>
     </li>
-    <li class="nav-item" v-if="loginstatus()">
+    <li class="nav-item" v-if="loginstatus() && installflag">
       <router-link class="nav-link"  to="/" @click="logout()">登出</router-link>
     </li>
     <!--<li class="nav-item dropdown">
@@ -34,7 +34,7 @@
       </div>
     </li> -->
   </ul>
-  <div class="form-inline my-2 my-lg-0">
+  <div class="form-inline my-2 my-lg-0" v-if="installflag">
   <input class="form-control mr-sm-2" type="search" placeholder="輸入關鍵字" v-model="SearchData" >
   <button class="btn btn-outline-success " @click="HeaderSearch(true)" >查詢</button>
   </div>
@@ -53,7 +53,9 @@ export default {
      ],
   data() {
       return {
-          SearchData: ''
+          SearchData: '',
+          HomeName:'想個好名字吧',
+          installflag:false
       };
   },
   created(){
@@ -66,19 +68,30 @@ export default {
   },
   Logined(){
       let me = this;
-      let state = me.useStore.state;
-      let data = new URLSearchParams();
-      data.append('commandType', "check");
-      
-      me.conection(data,function(response){
-       let success = response.data.success;
-       if (success == "1"){
-           state.logined = true;
-       }
-       else{
-           state.logined = false;
-       }
-      });
+      if(me.$route.name!="install"){
+         let state = me.useStore.state;
+         let data = new URLSearchParams();
+         data.append('commandType', "gethomename");
+         me.conection(data,function(response){
+          let success = response.data.success;
+          if (success == "1"){
+              let result = response.data.result[0];
+              me.HomeName = result['PAGENAME'];
+              me.installflag = true;
+          }});
+
+         data = new URLSearchParams();
+         data.append('commandType', "check");
+         
+         me.conection(data,function(response){
+          let success = response.data.success;
+          if (success == "1"){
+              state.logined = true;
+          }
+          else{
+              state.logined = false;
+          } });
+      }
   },
   logout(){
       let me = this;
@@ -98,8 +111,10 @@ export default {
       state.list = [];
       state.logined = false;
       state.noDataFlag = false;
-      me.Logined();
-      me.HeaderSearch();
+      if(me.$route.name!="install"){
+         me.Logined();
+         me.HeaderSearch();
+      }
   },
   HeaderSearch(flag){
       let me = this;

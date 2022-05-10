@@ -1,14 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import HeaderView from '../views/HeaderView.vue'
-import FooterView from '../views/FooterView.vue'
-import AboutView from '../views/AboutView.vue'
+//import FooterView from '../views/FooterView.vue'
+//import AboutView from '../views/AboutView.vue'
 import RightListView from '../views/RightListView.vue'
 import loginView from '../views/LoginView.vue'
 import EditedView from '../views/EditedView.vue'
 import ArticleView from '../views/ArticleView.vue'
-
-
+import InstallView from '../views/InstallView.vue'
 
 const routes = [
   {
@@ -17,19 +16,19 @@ const routes = [
     components: {
       default: HomeView,
       Header:HeaderView,
-      Footer:FooterView,
+      //Footer:FooterView,
       RightList:RightListView
-    }
+    },
+    meta:{ installedAuth: true}
   },
   {
-    path: '/about',
-    name: 'about',
+    path: '/install',
+    name: 'install',
     components: {
-      default: AboutView,
-      Header:HeaderView,
-      Footer:FooterView,
-      RightList:RightListView
-    }
+      default: InstallView,
+      Header:HeaderView
+    },
+    meta:{ installAuth: true}
   },
   {
     path: '/login',
@@ -37,11 +36,11 @@ const routes = [
     components: {
       default: HomeView,
       Header:HeaderView,
-      Footer:FooterView,
+      //Footer:FooterView,
       RightList:RightListView,
       modal:loginView
     },
-    meta:{ loginAuth: true}
+    meta:{installedAuth: true,loginAuth: true}
   },
   {
     path: '/edited/:UUID',
@@ -49,11 +48,11 @@ const routes = [
     components: {
       default:HomeView,
       Header:HeaderView,
-      Footer:FooterView,
+      //Footer:FooterView,
       RightList:RightListView,
       modal:EditedView
     },
-    meta:{ requiresAuth: true}
+    meta:{installedAuth: true,requiresAuth: true}
   },
   {
     path: '/article/:UUID',
@@ -61,11 +60,11 @@ const routes = [
     components: {
       default:HomeView,
       Header:HeaderView,
-      Footer:FooterView,
+      //Footer:FooterView,
       RightList:RightListView,
       modal:ArticleView
     },
-    meta:{ requiresAuth: true}
+    meta:{installedAuth: true,requiresAuth: true}
   }
 ]
 

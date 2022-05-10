@@ -29,6 +29,9 @@
        case  "update":
          UpdateResult($_POST['UUID'],$_POST['MTDT']);
          break;
+       case  "gethomename":
+         HomeNameResult();
+         break;
     }
   }
   
@@ -162,7 +165,7 @@
   function PostResult($content,$POWER,$CATEGORY){
      if(check()){
       $uniqid = uniqid();
-      
+      $TOPIC = mb_substr( strip_tags($content) , 0 , 10,'UTF-8');
       $UUID = mb_substr( strip_tags($content) , 0 , 10,'UTF-8')."_".$uniqid;
       //SQL語法
       $sql = "INSERT INTO article 
@@ -179,7 +182,7 @@
                           ?,
                           ?)";
       $ss="ssssss";
-      $params = [$UUID, $content, "", $_COOKIE['authorname'], $POWER,$CATEGORY];
+      $params = [$UUID, $content, $TOPIC, $_COOKIE['authorname'], $POWER,$CATEGORY];
       //解析回應資料     
       if(CommandResult($sql,$ss,$params)){
           $arr = array('null' => "");
@@ -552,4 +555,14 @@
       }
     }
     }
+function HomeNameResult(){
+  $sql = "SELECT PAGENAME
+            FROM title
+           WHERE NAME = ?";
+  //解析回應資料
+  $ss = "s";
+  $arry = ['home'];
+  $returnData = SelectResult($sql,$ss,$arry);
+  echo OutputResult("","1",$returnData);
+}
 ?>

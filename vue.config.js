@@ -69,7 +69,7 @@ module.exports = defineConfig({
     config
         .plugin('html')
         .tap(args => {
-            args[0].title = "四元素部落格";
+            args[0].title = "";
             return args;
         })
   },

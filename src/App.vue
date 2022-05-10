@@ -66,13 +66,13 @@ export default {
     reload () {
       this.display++;
     },
-    conection (data,response) {
+    conection (data,response,command="Command") {
       let me = this;
       let useStore = me.useStore;
       let http = useStore.state.axios;
       let phpurl = useStore.getters.phpurl;
 
-      http.post(phpurl("Command"),data)
+      http.post(phpurl(command),data)
       .then(response)
       .catch(function (error) {
        alert(error);
