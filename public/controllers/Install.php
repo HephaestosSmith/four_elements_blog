@@ -7,8 +7,8 @@ function main(){
     $path = './Conection.php';
     $arr = array('null' => "");
     if (file_exists($path)) {
-        getTitle();
-        //echo OutputResult("已安裝完成","1",$arr);
+        echo OutputResult("已安裝完成","1",$arr);
+        //getTitle();
     } else {
         if(!isset($_POST['HOME']) || $_POST['HOME'] == ""){
             echo OutputResult("請輸入網站名稱","0",$arr);
@@ -125,48 +125,62 @@ catch(Exception $e) {
 }
 }
 
+
 function getTitle(){
-    $sql = "SELECT PAGENAME
+    $arry = [];
+    $ss = "";
+  
+    if (isset($_POST['name']) &&  $_POST['name'] != "" &&  $_POST['name'] != "home"){
+        $pagesql = "(SELECT PAGENAME
+                       FROM title
+                      WHERE NAME = ?)";
+        $ss = $ss."s";
+        array_push($arry,$_POST['name']);
+    } else {
+        $pagesql = "''";
+    }    
+    
+    if (isset($_POST['param']) &&  $_POST['param'] != ""){
+        
+      $param = json_decode($_POST['param'],true);
+      if(array_key_exists("UUID",$param)){
+        $UUID = $param['UUID'];
+        $topicsql = "(SELECT TOPIC
+                        FROM article
+                       WHERE UUID = ?)";
+        $ss = $ss."s";
+        array_push($arry,$UUID);
+      }else{
+        $topicsql = "''";
+      }
+    } else {
+        $topicsql = "''";
+    }
+  
+    $sql ="SELECT PAGENAME AS HOME,
+                  ".$pagesql." AS PAGNAME,
+                  ".$topicsql." AS TOPIC
               FROM title
              WHERE NAME = ?";
-    //解析回應資料
-    $ss = "s";
-    $arry = ['home'];
+      //解析回應資料
+    $ss = $ss."s";
+    array_push($arry,'home');
     $returnData = json_decode(SelectResult($sql,$ss,$arry),true)[0];
-    $homename = $returnData ['PAGENAME'];
-
-    if(isset($_POST['name']) &&  $_POST['name'] != "" &&  $_POST['name'] != "home"){
-       $sql = "SELECT PAGENAME
-                 FROM title
-                WHERE NAME = ?";
-       //解析回應資料
-       $ss = "s";
-       $arry = [$_POST['name']];
-       $returnData = json_decode(SelectResult($sql,$ss,$arry),true)[0];
-       $pagename = $returnData ['PAGENAME'];
-       $homename = $homename."-".$pagename;
-    }
     
-    if(isset($_POST['param']) &&  $_POST['param'] != ""){
-        $param = json_decode($_POST['param'],true);
-        if(array_key_exists("UUID",$param)){
-            $UUID = $param['UUID'];
-            $sql = "SELECT TOPIC
-                      FROM article
-                     WHERE UUID = ?";
-            //解析回應資料
-            $ss = "s";
-            $arry = [$UUID];
-            $returnData = json_decode(SelectResult($sql,$ss,$arry),true)[0];
-            $TOPIC = $returnData ['TOPIC'];
-            $homename = $homename."@".$TOPIC ;
-        }
+    $homename = $returnData['HOME'];
+    if($returnData['PAGNAME'] != null){
+       if(strlen($returnData['PAGNAME']) > 0){
+           $homename = $homename."-".$returnData['PAGNAME'];
+       }
     }
-    
+    if($returnData['TOPIC'] != null){
+      if(strlen($returnData['TOPIC']) > 0){
+         $homename = $homename."@".$returnData['TOPIC'];
+      }
+    }
     $title = array('title' => $homename);
     echo OutputResult("已安裝完成","1",$title);
-}
-
+  }
 //查看陣列用
 function r($var){
     echo '<pre>';
