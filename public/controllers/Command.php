@@ -15,13 +15,16 @@
         CheckPOWERResult();
         break;
        case "post":
-        PostResult($_POST['content'],$_POST['POWER'],$_POST['CATEGORY']);
+        PostResult();
         break;
        case "getAticle":
          AticleResult($_POST['SEARCHTYPE'],$_POST['KEYWORD']);
          break;
-       case  "getCATEGORYS":
-         CATEGORYSResult();
+       case  "getMAINCATEGORYS":
+         MAINCATEGORYSResult();
+         break;
+       case  "getSUBCATEGORYS":
+         SUBCATEGORYSResult();
          break;
        case  "delete":
          DeleteResult($_POST['UUID']);
@@ -32,9 +35,13 @@
        case  "gethomename":
          HomeNameResult();
          break;
-      case "getTitle":
+       case "getTitle":
          getTitle();
          break;
+       case "getALLCATEGORYS":
+         ALLCATEGORYSResult();
+         break;
+          
     }
   }
   
@@ -51,6 +58,9 @@
       case "CONTENT":
         CONTENTResult($KEYWORD);
        break;
+       case "CATEGORY":
+        CATEGORYResult($KEYWORD);
+        break;
    }
   }
   function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
@@ -165,11 +175,12 @@
      }
   }
   //發表
-  function PostResult($content,$POWER,$CATEGORY){
+  function PostResult(){
      if(check()){
+      InsertMAINCATEGORY();
       $uniqid = uniqid();
-      $TOPIC = mb_substr( strip_tags($content) , 0 , 10,'UTF-8');
-      $UUID = mb_substr( strip_tags($content) , 0 , 10,'UTF-8')."_".$uniqid;
+      $TOPIC = mb_substr( strip_tags($_POST['content']) , 0 , 10,'UTF-8');
+      $UUID = mb_substr( strip_tags($_POST['content']) , 0 , 10,'UTF-8')."_".$uniqid;
       //SQL語法
       $sql = "INSERT INTO article 
                          (`UUID`,
@@ -185,7 +196,7 @@
                           ?,
                           ?)";
       $ss="ssssss";
-      $params = [$UUID, $content, $TOPIC, $_COOKIE['authorname'], $POWER,$CATEGORY];
+      $params = [$UUID, $_POST['content'], $TOPIC, $_COOKIE['authorname'], $_POST['POWER'],$_POST['SUBCATEGORY']];
       //解析回應資料     
       if(CommandResult($sql,$ss,$params)){
           $arr = array('null' => "");
@@ -387,15 +398,145 @@
     echo OutputResult("","1",$arr);
     }
   }
+  
+  //回傳關鍵字查詢結果 FOR VUE
+  function CATEGORYResult($KEYWORD){
+    if(isset($_COOKIE['username'])) {
+      if(check()){
+       if (isset($_POST['CREATETIME'])){
+        //SQL語法
+        $sql = "SELECT *,
+                       date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
+                  FROM article
+                 WHERE POWER < (SELECT POWER
+                                  FROM member
+                                 WHERE USERNAME = ?
+                                   AND TOKEN =?)
+                   AND CREATETIME < ?
+                   AND CATEGORY LIKE ?
+                 ORDER BY CREATETIME DESC
+                 LIMIT 5";
+         //解析回應資料
+         $ss = "ssss";
+         $arry = [$_COOKIE['username'],$_COOKIE['TOKEN'],$_POST['CREATETIME'],$KEYWORD];
+         $returnData = SelectResult($sql,$ss,$arry);
+       }else{
+        //SQL語法
+        $sql = "SELECT *,
+                       date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
+                  FROM article
+                 WHERE POWER < (SELECT POWER
+                                  FROM member
+                                 WHERE USERNAME = ?
+                                   AND TOKEN =?)
+                   AND CATEGORY LIKE ?
+                 ORDER BY CREATETIME DESC
+                 LIMIT 5";
+  
+         //解析回應資料    
+         $ss = "sss";
+         $arry = [$_COOKIE['username'],$_COOKIE['TOKEN'],$KEYWORD];
+         $returnData = SelectResult($sql,$ss,$arry);
+       }
+        
+        if(strlen($returnData)> 0){    
+          echo OutputResult("","1",$returnData);
+        }
+        else{
+          $arr = array('null' => "");
+          echo OutputResult("","1",$arr);
+        }
+    }else{
+      CATEGORYDefaultSearch($KEYWORD);
+    }
+    }else{
+      CATEGORYDefaultSearch($KEYWORD);
+    }
+    }
+  function CATEGORYDefaultSearch($KEYWORD){
+    //loading使用
+    if (isset($_POST['CREATETIME'])){
+      //SQL語法
+      $sql = "SELECT *,
+                     date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
+                FROM article
+              WHERE POWER = 0
+                AND CREATETIME < ?
+                AND CATEGORY LIKE ?
+               ORDER BY CREATETIME DESC
+              LIMIT 5";
+      //解析回應資料    
+       $ss = "ss";
+       $arry = [$_POST['CREATETIME'],$KEYWORD];
+       $returnData = SelectResult($sql,$ss,$arry);
+    }
+    else{
+      //SQL語法
+      $sql = "SELECT *,
+                     date_format( CREATETIME,'%Y/%m/%d') AS CREATEDATE
+                FROM article
+              WHERE POWER = 0
+                AND 1 = ?
+                AND CATEGORY LIKE ?
+               ORDER BY CREATETIME DESC
+              LIMIT 5";
+      //解析回應資料    
+       $ss = "ss";
+       $arry = [1,$KEYWORD];
+       $returnData = SelectResult($sql,$ss,$arry);
+    }
+    if(strlen($returnData)> 0){
+    echo OutputResult("","1",$returnData);
+    }
+    else{
+    $arr = array('null' => "");
+    echo OutputResult("","1",$arr);
+    }
+  }
   //回傳分類 FOR VUE
-  function CATEGORYSResult(){
-    //SQL語法
-    $sql = "SELECT DISTINCT 
-                   CATEGORY
-              FROM article
-             WHERE 1 = ?";
+  function MAINCATEGORYSResult(){
+    $ss = '';
+    $params = [];
+    if(isset($_POST['SUBCATEGORY'])){
+        //SQL語法
+        $sql = "SELECT A.*,
+                       ISNULL(B.CATEGORYNAME) AS FLAG
+                  FROM categorys A
+                       LEFT JOIN categorys B ON B.MAINCATEGORYID = A.CATEGORYINDEX
+                                            AND B.CATEGORYNAME = ?
+                 WHERE A.MAINCATEGORYID = ?";
+        $ss = 'ss';
+        $params = [$_POST['SUBCATEGORY'],0];
+
+    }else{
+        //SQL語法
+        $sql = "SELECT *
+                  FROM categorys
+                 WHERE MAINCATEGORYID = ?";
+        $ss = 'i';
+        $params = [0];
+    }
      //解析回應資料    
-     $returnData = SelectResult($sql,"s",[1]);
+    $returnData = SelectResult($sql,$ss,$params);
+    if(strlen($returnData)> 0){    
+      echo OutputResult("","1",$returnData);
+    }
+    else{
+      $arr = array('null' => "");
+      echo OutputResult("","1",$arr);
+    }
+  }
+  //回傳分類 FOR VUE
+  function SUBCATEGORYSResult(){
+    //SQL語法
+    $sql = "SELECT *
+              FROM categorys
+             WHERE MAINCATEGORYID = (SELECT CATEGORYINDEX
+                                       FROM categorys
+                                      WHERE MAINCATEGORYID = 0
+                                        AND CATEGORYNAME = ?)";
+     //解析回應資料    
+    $returnData = SelectResult($sql,"s",[$_POST['MAINCATEGORY']]);
     if(strlen($returnData)> 0){    
       echo OutputResult("","1",$returnData);
     }
@@ -475,6 +616,7 @@
   //發表
   function UpdateResult($UUID,$MTDT){
     if(check()){
+     InsertMAINCATEGORY();
      $today = date('Y/m/d H:i:s');
      
      //SQL語法
@@ -486,7 +628,7 @@
               WHERE article.UUID = ?
                 AND MTDT = ?";
      $ss="ssssss";
-     $params = [$_POST['CONTENT'], $_POST['POWER'], $_POST['CATEGORY'], $today , $UUID,$MTDT];
+     $params = [$_POST['CONTENT'], $_POST['POWER'], $_POST['SUBCATEGORY'], $today , $UUID,$MTDT];
      //解析回應資料     
      if(CommandResult($sql,$ss,$params)){
          $arr = array('null' => "");
@@ -570,6 +712,11 @@ function HomeNameResult(){
 }
 
 function getTitle(){
+  $path = './Conection.php';
+  if (!file_exists($path)) {
+    echo OutputResult("未安裝","0",[]);
+    return;
+  }
   $arry = [];
   $ss = "";
 
@@ -624,6 +771,69 @@ function getTitle(){
   $title = array('title' => $homename);
   echo OutputResult("已安裝完成","1",$title);
 }
+
+function InsertMAINCATEGORY(){
+  if(!isset($_POST['MAINCATEGORY'])){
+    return;
+  }
+  if($_POST['MAINCATEGORY'] != ''){
+    //SQL語法
+    $sql = "SELECT CATEGORYINDEX
+              FROM categorys
+             WHERE MAINCATEGORYID = 0
+               AND CATEGORYNAME = ?";
+    $ss = 's';
+    $params = [$_POST['MAINCATEGORY']];
+    //解析回應資料    
+    $returnData = json_decode(SelectResult($sql,$ss,$params), true);
+    if(count($returnData) == 0){
+       $sql ="INSERT INTO `categorys` (`CATEGORYINDEX`, `CATEGORYNAME`, `MAINCATEGORYID`) VALUES (NULL, ?, '0');";
+       if(CommandResult($sql,$ss,$params)){
+         //SQL語法
+         $sql = "SELECT CATEGORYINDEX
+                   FROM categorys
+                  WHERE MAINCATEGORYID = 0
+                    AND CATEGORYNAME = ?";
+         $returnData = json_decode(SelectResult($sql,$ss,$params), true);
+       }
+    }
+    $data = $returnData[0];
+    $CATEGORYINDEX = $data['CATEGORYINDEX'];
+    InsertSUBCATEGORY($CATEGORYINDEX);
+  }
+}
+function InsertSUBCATEGORY($MAINCATEGORYID){
+  //SQL語法
+  $sql = "SELECT CATEGORYINDEX
+            FROM categorys
+           WHERE MAINCATEGORYID = ?
+             AND CATEGORYNAME = ?";
+  $ss = 'ss';
+  $params = [$MAINCATEGORYID,$_POST['SUBCATEGORY']];
+  //解析回應資料    
+  $returnData = json_decode(SelectResult($sql,$ss,$params), true);
+  if(count($returnData) == 0){
+     $sql ="INSERT INTO `categorys` (`CATEGORYINDEX`, `CATEGORYNAME`, `MAINCATEGORYID`) VALUES (NULL, ?, ?);";
+     $params = [$_POST['SUBCATEGORY'],$MAINCATEGORYID];
+     CommandResult($sql,$ss,$params);
+  }
+}
+function ALLCATEGORYSResult(){
+    //SQL語法
+    $sql = "SELECT *
+              FROM categorys
+             WHERE 1 = ?";
+     //解析回應資料    
+    $returnData = SelectResult($sql,"s",[1]);
+    if(strlen($returnData)> 0){    
+      echo OutputResult("","1",$returnData);
+    }
+    else{
+      $arr = array('null' => "");
+      echo OutputResult("","1",$arr);
+    }
+}
+
 /*function getTitle(){
   $sql = "SELECT PAGENAME
             FROM title

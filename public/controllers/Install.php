@@ -84,6 +84,13 @@ function CreateTable($db){
     $addname->execute();
     $addname->close();
 
+    //categorys檢查資料表是否存在
+    $query = $db->query("SHOW TABLES LIKE 'categorys'");
+    if(mysqli_num_rows($query) == 0){
+      $sql = "CREATE TABLE `categorys` ( `CATEGORYINDEX` INT NOT NULL AUTO_INCREMENT , `CATEGORYNAME` TEXT NOT NULL , `MAINCATEGORYID` INT NOT NULL DEFAULT '0' , PRIMARY KEY (`CATEGORYINDEX`)) ENGINE = InnoDB;";
+      $query = $db->query($sql);
+    }
+
     //新增資料 
     $sql = "INSERT INTO `member` (`USERID`, `USERNAME`, `PASSWORD`, `POWER`, `TOKEN`, `AUTHORNAME`) VALUES ('1', ?, ?, '5', '', ?)";
     //解析回應資料    

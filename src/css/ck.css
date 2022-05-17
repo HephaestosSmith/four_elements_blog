@@ -410,15 +410,48 @@
     }
 }
 .ck-content pre[class]:after {
-    background: var(--ck-color-code-block-label-background);
+content: attr(class);
+position: absolute;
+}
+.ck-content pre[class]:after {
     color: #fff;
     font-family: var(--ck-font-face);
     font-size: 10px;
     line-height: 16px;
     padding: var(--ck-spacing-tiny) var(--ck-spacing-medium);
     right: 15px;
-    top: 9px;
+    margin-top:20px;
     white-space: nowrap;
-    content: attr(class);
-    position: absolute;
 }
+
+.submenulist{
+  cursor: pointer;
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .25s;
+  margin-left: 20px; 
+}
+.menulist{
+  cursor: pointer;
+  margin-left: 20px; 
+}
+.menulist:hover>.submenulist{
+  max-height: 500px;
+}
+.menushow{
+  max-height: 500px;
+}
+.menutitle{
+  color: white;
+  font-weight:bold;
+}
+.menutitle:hover{
+    color: aqua;
+}
+.submenutitle{
+  color: white;
+}
+
+.submenutitle:hover{
+    color: aqua;
+} 

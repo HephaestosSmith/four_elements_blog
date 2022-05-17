@@ -136,7 +136,7 @@ export default {
      me.useStore = useStore();
      me.editor = me.useStore.state.CKEditor;
      me.editorConfig = me.useStore.state.editorConfig;
-     this.Logined();
+     me.getAticle();
   },
   methods:{
       loginstatus(){
@@ -145,23 +145,6 @@ export default {
          let flag = logined & !load;
          return flag;
       },
-      Logined(){
-      let me = this;
-      let state = me.useStore.state;
-      let data = new URLSearchParams();
-      data.append('commandType', "check");
-      
-      me.conection(data,function(response){ 
-       let success = response.data.success;
-       if (success == "1"){
-           state.logined = true;
-       }
-       else{
-           state.logined = false;
-       }
-       me.getAticle();
-      });
-  },
   getAticle(){
       let me = this;
       let UUID = me.$route.params.UUID;

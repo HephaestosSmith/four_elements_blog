@@ -1,0 +1,86 @@
+<template>
+    <router-link style="text-decoration:none;" class="rounded text-wrap article text-white row" :to="{ name: 'article', params: { UUID: item.UUID } }" :key="item.UUID" data-toggle="modal" data-target="#ModalView">
+      <div class="col">
+           <div class="row">
+                <div class="col-6">
+                   {{ item.CREATEDATE }}
+                </div>
+                <div class="col-6 text-right">
+                   <!--<a class="dropdown"  v-if="loginstatus()">
+                     <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" style="height: 35px;">
+                     </a>
+                     <div class="dropdown-menu">
+                       <router-link class="dropdown-item btn"  :to="{ name: 'edited', params: { UUID: item.UUID } }" data-toggle="modal" data-target="#ModalView">編輯</router-link>
+                       <button class="dropdown-item btn" @click="Delete(item.UUID)">刪除</button>
+                     </div>
+                  </a>-->
+                </div>
+           </div>
+           <div style="height:8px;"/>
+           <div class="row">
+                <div class="col ck-content" v-html= item.CONTENT style="max-height:200px; overflow: hidden;" ref="content">
+                </div>
+           </div>
+           <div class="row" v-show="isLongContent">
+              <div class="col ck-content text-black" style="color: deepskyblue;-webkit-text-stroke: medium; text-shadow: 1px 2px black;" >... MORE</div>
+           </div>
+           <hr>
+           <div class="row">
+              <div class="col-7">
+                    發文時間:{{ item.CREATETIME }}
+              </div>
+              <div class="col-5 text-right">
+                  作者: {{item.AUTHOR}}
+              </div>
+           </div>
+          </div>
+      </router-link><!--</div>-->
+</template>
+<script>
+import Prism from "prismjs";
+import 'prismjs/components/prism-bash'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-json'
+import 'prismjs/components/prism-liquid'
+import 'prismjs/components/prism-markdown'
+import 'prismjs/components/prism-markup-templating'
+import 'prismjs/components/prism-php'
+import 'prismjs/components/prism-scss'
+
+export default {
+  props: {
+    item: {
+      type: Object,
+    },
+  },
+  data() {
+      return {
+          isLongContent:false
+      };
+  },
+  watch:{
+       "item.CONTENT": function (){
+         this.$nextTick(function () {
+           this.calculateHeight();
+         });
+       }
+  },
+  mounted() {
+       this.calculateHeight();
+  },
+  methods:{
+  calculateHeight(){
+          let contentHeight = this.$refs.content.clientHeight
+          if (contentHeight >= 200) {
+            this.isLongContent = true
+          } else {
+            this.isLongContent = false
+          }
+          this.PrismView();
+  },
+  PrismView(){
+      Prism.highlightAll(); 
+  }
+  }
+}
+</script>

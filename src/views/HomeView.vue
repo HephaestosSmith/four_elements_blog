@@ -15,16 +15,29 @@
                <option value="1" selected>不公開</option>
              </select>
              </div>
-             <div class="col-sm-8" style="margin-top: 5px;">
+             <div class="col-sm-4" style="margin-top: 5px;">
                <div class="row">
                   <div class="col-4" style="padding-right: 5px;padding-left: 10px;">
-                     <select class="form-select"  v-model="CATEGORY" style="width: inherit;">
+                     <select class="form-select"  v-model="MAINCATEGORY" style="width: inherit;">
                        <option value=""></option>
-                       <option  v-for="(item,index) in CATEGORYS" :key="index">{{ item }}</option>
+                       <option  v-for="(item,index) in MAINCATEGORYS" :key="index">{{ item }}</option>
                      </select>
                   </div>
                   <div class="col-8" style="padding-right: 0px;padding-left: 0px;">
-                     <input type="text" class="form-control" placeholder="分類"  v-model="CATEGORY" style="height: 25px;" >
+                     <input type="text" class="form-control" placeholder="主分類"  v-model="MAINCATEGORY" style="height: 25px;" >
+                  </div>
+               </div>
+             </div>
+             <div class="col-sm-4" style="margin-top: 5px;">
+               <div class="row">
+                  <div class="col-4" style="padding-right: 5px;padding-left: 10px;">
+                     <select class="form-select"  v-model="SUBCATEGORY" style="width: inherit;">
+                       <option value=""></option>
+                       <option  v-for="(item,index) in SUBCATEGORYS" :key="index">{{ item }}</option>
+                     </select>
+                  </div>
+                  <div class="col-8" style="padding-right: 0px;padding-left: 0px;">
+                     <input type="text" class="form-control" placeholder="子分類"  v-model="SUBCATEGORY" style="height: 25px;" >
                   </div>
                </div>
              </div>
@@ -36,41 +49,7 @@
       </div>
     </div>
     <div v-for="(item,index) in this.useStore.state.list" :key="index" >
-    <router-link style="text-decoration:none;" class="rounded text-wrap article text-white row" :to="{ name: 'article', params: { UUID: item.UUID } }" :key="item.UUID" data-toggle="modal" data-target="#ModalView">
-      <!--<div class="rounded text-wrap article text-white row">-->
-      <div class="col">
-           <div class="row">
-                <div class="col-6">
-                   {{ item.CREATEDATE }}
-                    <!--<router-link class="rounded text-wrap article text-white row" :to="{ name: 'article', params: { UUID: item.UUID } }" :key="item.UUID" data-toggle="modal" data-target="#ModalView">登入</router-link>-->
-                </div>
-                <div class="col-6 text-right">
-                   <!--<a class="dropdown"  v-if="loginstatus()">
-                     <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" style="height: 35px;">
-                     </a>
-                     <div class="dropdown-menu">
-                       <router-link class="dropdown-item btn"  :to="{ name: 'edited', params: { UUID: item.UUID } }" data-toggle="modal" data-target="#ModalView">編輯</router-link>
-                       <button class="dropdown-item btn" @click="Delete(item.UUID)">刪除</button>
-                     </div>
-                  </a>-->
-                </div>
-           </div>
-           <div style="height:8px;"/>
-           <div class="row">
-                <div class="col ck-content" v-html= item.CONTENT>
-                </div>
-           </div>
-           <hr>
-           <div class="row">
-              <div class="col-7">
-                    發文時間:{{ item.CREATETIME }}
-              </div>
-              <div class="col-5 text-right">
-                  作者: {{item.AUTHOR}}
-              </div>
-           </div>
-          </div>
-      </router-link><!--</div>-->
+      <HomeAticleItem :item="item" :key="item.UUID" />
     </div>
     <div class="row">
       <div class="col">
@@ -105,15 +84,7 @@
 </template>
 <script>
 import { useStore } from 'vuex'
-import Prism from "prismjs";
-import 'prismjs/components/prism-bash'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-json'
-import 'prismjs/components/prism-liquid'
-import 'prismjs/components/prism-markdown'
-import 'prismjs/components/prism-markup-templating'
-import 'prismjs/components/prism-php'
-import 'prismjs/components/prism-scss'
+import HomeAticleItem from '../components/HomeAticleItem.vue'
 
 
 export default {
@@ -127,23 +98,33 @@ export default {
           editorData: '',
           editorConfig: '' ,
           loading:true,
-          CATEGORY:'',
-          CATEGORYS:[],
-          listcount:0
+          SUBCATEGORY:'',
+          SUBCATEGORYS:[],
+          MAINCATEGORY:'',
+          MAINCATEGORYS:[],
+          listcount:0,
+          list:[],
+          logined:false
       };
   },
-  updated(){
-    let me = this;
-    let list = me.useStore.state.list.length;
-    if (me.listcount != list){
-      me.listcount =list;
-      me.PrismView();
-    }
+  components: {
+    HomeAticleItem
+  },
+  watch:{
+       MAINCATEGORY: function (){
+         this.getSUBCATEGORYS();
+       },
+       logined: function (){
+         if(this.logined){
+           this.getMAINCATEGORYS();
+         }
+       }
   },
   created(){
      let me = this;
      me.useStore = useStore();
      me.useStore.state.list = [];
+     me.list = me.useStore.state.list;
      me.loading = true;
      me.editor = me.useStore.state.CKEditor;
      me.editorConfig = me.useStore.state.editorConfig;
@@ -151,10 +132,8 @@ export default {
   },
   methods:{
       loginstatus(){
-         let logined = this.useStore.state.logined;
-         let load = this.loading;
-         let flag = logined & !load;
-         return flag;
+         this.logined = this.useStore.state.logined;
+         return this.logined;
       },
       Logined(){
       let me = this;
@@ -165,21 +144,8 @@ export default {
         window.addEventListener('scroll', this.handleScroll, true);
       }
 
-      let data = new URLSearchParams();
-      data.append('commandType', "check");
       state.SEARCHTYPE = 'default';
-
-      me.conection(data,function(response){
-       let success = response.data.success;
-       if (success == "1"){
-           state.logined = true;
-           me.getCATEGORYS();
-       }
-       else{
-           state.logined = false;
-       }
-       me.getAticle(false);
-      });
+      me.getAticle(false);
   },
   getAticle(postflag/*檢查是否發文章*/){
       let me = this;
@@ -227,19 +193,33 @@ export default {
   post(){
       let me = this;
       
+      if ( me.editorData == ""){
+        alert("請輸入文章");
+        return;
+      }
+
+      if (me.MAINCATEGORY != ""){
+          if (me.SUBCATEGORY == ""){
+            alert("請選擇或輸入子分類");
+            return;
+          }
+      }
+
       let data = new URLSearchParams();
       data.append('commandType', "post");
       data.append('content', me.editorData);
       data.append('POWER',me.POWER);
-      data.append('CATEGORY',me.CATEGORY);
+      data.append('MAINCATEGORY',me.MAINCATEGORY);
+      data.append('SUBCATEGORY',me.SUBCATEGORY);
       
       me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
            me.editorData = "";
            me.getAticle(true);
-           me.getCATEGORYS();
-           me.CATEGORY = "";
+           me.getMAINCATEGORYS();
+           me.MAINCATEGORY = "";
+           me.SUBCATEGORY = "";
        }
        else{
           let msg =response.data.msg;
@@ -257,25 +237,51 @@ export default {
           }
       }
   },
-  PrismView(){
-      Prism.highlightAll(); 
-  },
-  getCATEGORYS(){
+  getMAINCATEGORYS(){
       let me = this;
       let data = new URLSearchParams();
-      data.append('commandType', "getCATEGORYS");
+      data.append('commandType', "getMAINCATEGORYS");
       
       me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
            let result = response.data.result;
-           let CATEGORYS = [];
+           let MAINCATEGORYS = [];
            result.forEach(element => {
-               if (element["CATEGORY"]!=""){
-               CATEGORYS.push(element["CATEGORY"]);
+               if (element["CATEGORYNAME"]!=""){
+                   if(element["MAINCATEGORYID"] == 0){
+                      MAINCATEGORYS.push(element["CATEGORYNAME"]);
+                   }
                }
            });
-           me.CATEGORYS = CATEGORYS;
+           me.MAINCATEGORYS = MAINCATEGORYS;
+       }
+       else{
+          let msg =response.data.msg;
+          me.loading = false;
+          alert(msg);
+       }
+      })
+  },
+  getSUBCATEGORYS(){
+      let me = this;
+      let data = new URLSearchParams();
+      data.append('commandType', "getSUBCATEGORYS");
+      data.append('MAINCATEGORY', me.MAINCATEGORY);
+      
+      me.conection(data,function(response){
+       let success = response.data.success;
+       if (success == "1"){
+           let result = response.data.result;
+           let SUBCATEGORYS = [];
+           result.forEach(element => {
+               if (element["CATEGORYNAME"]!=""){
+                   if(element["MAINCATEGORYID"] != 0){
+                      SUBCATEGORYS.push(element["CATEGORYNAME"]);
+                   }
+               }
+           });
+           me.SUBCATEGORYS = SUBCATEGORYS;
        }
        else{
           let msg =response.data.msg;

@@ -1,13 +1,14 @@
 
 <template>
-    <div class="row">
-    </div>
+    <MAINCATEGORYSItem />
 </template>
 
 <script>
+import MAINCATEGORYSItem from '../components/MAINCATEGORYSItem.vue'
+
 export default {
-  created() {
-      
+  components: {
+    MAINCATEGORYSItem
   }
 }
 </script>

@@ -17,22 +17,13 @@
     <li class="nav-item">
       <router-link class="nav-link" to="/" @click="home()" v-if="installflag">首頁</router-link>
     </li>
+    <HeaderMAINCATEGORYSItem/>
     <li class="nav-item" v-if="!loginstatus() && installflag">
       <router-link class="nav-link" to="/login"  data-toggle="modal" data-target="#ModalView">登入</router-link>
     </li>
     <li class="nav-item" v-if="loginstatus() && installflag">
       <router-link class="nav-link"  to="/" @click="logout()">登出</router-link>
     </li>
-    <!--<li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-        Dropdown link
-      </a>
-      <div class="dropdown-menu">
-        <a class="dropdown-item" href="#">Link 1</a>
-        <a class="dropdown-item" href="#">Link 2</a>
-        <a class="dropdown-item" href="#">Link 3</a>
-      </div>
-    </li> -->
   </ul>
   <div class="form-inline my-2 my-lg-0" v-if="installflag">
   <input class="form-control mr-sm-2" type="search" placeholder="輸入關鍵字" v-model="SearchData" >
@@ -43,6 +34,7 @@
 </template>
 
 <script>
+import HeaderMAINCATEGORYSItem from '../components/HeaderMAINCATEGORYSItem.vue'
 import { useStore } from 'vuex'
 import Cookies from 'vue-cookie'
 
@@ -57,6 +49,9 @@ export default {
           HomeName:'想個好名字吧',
           installflag:false
       };
+  },
+  components: {
+    HeaderMAINCATEGORYSItem
   },
   created(){
      this.useStore = useStore();
@@ -153,3 +148,14 @@ export default {
   }
 }
 </script>
+
+<style>
+.navbar-nav li:hover>.dropdown-menu {
+  display: block;
+  margin-top: 0px;
+}
+.navbar-nav li .dropdown-menu .dropright:hover>.dropdown-menu{
+  display: block;
+  margin-left: -5px;
+}
+</style>

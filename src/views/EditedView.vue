@@ -7,7 +7,47 @@
              </div>
          </div>
         <div style="height:8px;"/>
+        
          <div class="row">
+             <div class="col-sm-2 text-white" style="margin-top: 5px;">
+               文章顯示:
+             <select class="form-select" v-model="POWER">
+               <option value="0">公開</option>
+               <option value="1" selected>不公開</option>
+             </select>
+             </div>
+             <div class="col-sm-4" style="margin-top: 5px;">
+               <div class="row">
+                  <div class="col-4" style="padding-right: 5px;padding-left: 10px;">
+                     <select class="form-select"  v-model="MAINCATEGORY" style="width: inherit;">
+                       <option value=""></option>
+                       <option  v-for="(item,index) in MAINCATEGORYS" :key="index">{{ item }}</option>
+                     </select>
+                  </div>
+                  <div class="col-8" style="padding-right: 0px;padding-left: 0px;">
+                     <input type="text" class="form-control" placeholder="主分類"  v-model="MAINCATEGORY" style="height: 25px;" >
+                  </div>
+               </div>
+             </div>
+             <div class="col-sm-4" style="margin-top: 5px;">
+               <div class="row">
+                  <div class="col-4" style="padding-right: 5px;padding-left: 10px;">
+                     <select class="form-select"  v-model="SUBCATEGORY" style="width: inherit;">
+                       <option value=""></option>
+                       <option  v-for="(item,index) in SUBCATEGORYS" :key="index">{{ item }}</option>
+                     </select>
+                  </div>
+                  <div class="col-8" style="padding-right: 0px;padding-left: 0px;">
+                     <input type="text" class="form-control" placeholder="子分類"  v-model="SUBCATEGORY" style="height: 25px;" >
+                  </div>
+               </div>
+             </div>
+             <div class="col-sm-2" style="margin-top: 5px;">
+             <a class="btn btn-primary" @click="PrismView()"  style="height:35px; margin-right: 5px;">預覽</a>
+             <a class="btn btn-primary" @click="update()"  style="height:35px;">修改</a>
+             </div>
+         </div>
+         <!--<div class="row">
              <div class="col-sm-2" style="margin-top: 5px;">
              <a class="btn btn-primary" @click="update()"  style="height:35px; margin-right: 5px;">修改</a>
              <a class="btn btn-primary" @click="PrismView()"  style="height:35px;">預覽</a>
@@ -32,7 +72,7 @@
                <option value="1" selected>不公開</option>
              </select>
              </div>
-         </div>
+         </div>-->
       </div>
     </div>
     <div class="row">
@@ -99,10 +139,20 @@ export default {
           editorData: '',
           editorConfig: '',
           loading:true,
-          CATEGORY:'',
-          CATEGORYS:[],
-          article:[]
+          SUBCATEGORY:'',
+          SUBCATEGORYS:[],
+          MAINCATEGORY:'',
+          MAINCATEGORYS:[],
+          article:[],
+          logined:false
       };
+  },
+  watch:{
+       MAINCATEGORY: function (){
+         if(!this.loading){
+         this.getSUBCATEGORYS();
+         }
+       }
   },
   created(){
      let me = this;
@@ -113,28 +163,14 @@ export default {
   },
   methods:{
       loginstatus(){
-         let logined = this.useStore.state.logined;
+         this.logined = this.useStore.state.logined;
          let load = this.loading;
-         let flag = logined & !load;
+         let flag = this.logined & !load;
          return flag;
       },
       Logined(){
-      let me = this;
-      let state = me.useStore.state;
-      let data = new URLSearchParams();
-      data.append('commandType', "check");
-      
-      me.conection(data,function(response){
-       let success = response.data.success;
-       if (success == "1"){
-           state.logined = true;
-           me.getCATEGORYS();
-       }
-       else{
-           state.logined = false;
-       }
-       me.getAticle();
-      });
+      let me = this;  
+      me.getAticle();
   },
   getAticle(){
       let me = this;
@@ -146,14 +182,14 @@ export default {
       data.append('KEYWORD', UUID);
       
       me.conection(data,function(response){
-       me.loading = false;
        let success = response.data.success;
        if (success == "1"){
            let result = response.data.result[0];
            me.article = result;
-           me.CATEGORY = me.article.CATEGORY;
            me.POWER = me.article.POWER;
            me.editorData = me.article.CONTENT;
+           me.SUBCATEGORY = me.article.CATEGORY;
+           me.getMAINCATEGORYS(me.article.CATEGORY);
            me.modalshow();
        }
        else{
@@ -164,12 +200,26 @@ export default {
   },
   update(){
       let me = this;
+      let state = me.useStore.state;
+      
+      if ( me.editorData == ""){
+        alert("請輸入文章");
+        return;
+      }
+
+      if (me.MAINCATEGORY != ""){
+          if (me.SUBCATEGORY == ""){
+            alert("請選擇或輸入子分類");
+            return;
+          }
+      }
       
       let data = new URLSearchParams();
       data.append('commandType', "update");
       data.append('CONTENT', me.editorData);
       data.append('POWER',me.POWER);
-      data.append('CATEGORY',me.CATEGORY);
+      data.append('MAINCATEGORY',me.MAINCATEGORY);
+      data.append('SUBCATEGORY',me.SUBCATEGORY);
       data.append('UUID',me.article.UUID);
       data.append('MTDT',me.article.MTDT);
       
@@ -177,7 +227,14 @@ export default {
          me.conection(data,function(response){
           let success = response.data.success;
           if (success == "1"){
-              me.$router.push("/");
+              me.$router.push({ name: 'article', params: { UUID: me.article.UUID} });
+             let list = state.list;
+             list.forEach(element =>{
+               if (element.UUID == me.article.UUID){
+                 element.CONTENT = me.editorData;
+               }
+             });
+             state.list = list;
           }
           else{
              let msg =response.data.msg;
@@ -188,29 +245,67 @@ export default {
         me.$router.push("/");
       }
   },
-  getCATEGORYS(){
+  getMAINCATEGORYS(SUBCATEGORY){
       let me = this;
       let data = new URLSearchParams();
-      data.append('commandType', "getCATEGORYS");
+      data.append('commandType', "getMAINCATEGORYS");
+      if(SUBCATEGORY != ''){
+      data.append('SUBCATEGORY', SUBCATEGORY);
+      }
       
       me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
            let result = response.data.result;
-           let CATEGORYS = [];
+           let MAINCATEGORYS = [];
            result.forEach(element => {
-               if (element["CATEGORY"]!=""){
-               CATEGORYS.push(element["CATEGORY"]);
+               if (element["CATEGORYNAME"]!=""){
+                   if(element["MAINCATEGORYID"] == 0){
+                      MAINCATEGORYS.push(element["CATEGORYNAME"]);
+                      if (element["FLAG"] == 0) {
+                        me.MAINCATEGORY = element["CATEGORYNAME"];
+                      }
+                   }
                }
            });
-           me.CATEGORYS = CATEGORYS;
+           me.MAINCATEGORYS = MAINCATEGORYS;
+           me.getSUBCATEGORYS(SUBCATEGORY);
        }
        else{
           let msg =response.data.msg;
           me.loading = false;
           alert(msg);
        }
-      });
+      })
+  },
+  getSUBCATEGORYS(SUBCATEGORY){
+      let me = this;
+      let data = new URLSearchParams();
+      data.append('commandType', "getSUBCATEGORYS");
+      data.append('MAINCATEGORY', me.MAINCATEGORY);
+      
+      me.conection(data,function(response){
+       me.loading = false;
+       let success = response.data.success;
+       if (success == "1"){
+           let result = response.data.result;
+           let SUBCATEGORYS = [];
+           result.forEach(element => {
+               if (element["CATEGORYNAME"]!=""){
+                   if(element["MAINCATEGORYID"] != 0){
+                      SUBCATEGORYS.push(element["CATEGORYNAME"]);
+                   }
+               }
+           });
+           me.SUBCATEGORYS = SUBCATEGORYS;
+           me.SUBCATEGORY = SUBCATEGORY;
+       }
+       else{
+          let msg =response.data.msg;
+          me.loading = false;
+          alert(msg);
+       }
+      })
   },
   changecheck(){
       let me = this;
