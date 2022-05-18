@@ -15,23 +15,6 @@ const app = createApp(App)
 router.install
 
 router.beforeEach((to, from, next) => {
-      if (to.meta.installedAuth) {  // 若要前往的頁面具有installedAuth的話，就不會放行
-          let data = new URLSearchParams();
-          data = new URLSearchParams();
-          data.append('commandType',"getTitle");
-          data.append('name',to.name);
-          data.append('param',JSON.stringify(to.params));
-          axios.post('/controllers/Command.php',data).then((response) => {
-            if (response.data.success == "1") {  // 若成功安裝→放行
-              let title = response.data.result.title;
-              document.title = title;
-            }else{
-              next({path: '/install'});
-            }
-          }).catch(function (error){
-            alert(error);
-          });
-        }
       if (to.meta.installAuth) {  // 若要前往的頁面具有installedAuth的話，就不會放行
         let data = new URLSearchParams();
         data.append('name',to.name);
@@ -75,6 +58,23 @@ router.beforeEach((to, from, next) => {
       }else{
         next();
       }
+      if (to.meta.installedAuth) {  // 若要前往的頁面具有installedAuth的話，就不會放行
+          let data = new URLSearchParams();
+          data = new URLSearchParams();
+          data.append('commandType',"getTitle");
+          data.append('name',to.name);
+          data.append('param',JSON.stringify(to.params));
+          axios.post('/controllers/Command.php',data).then((response) => {
+            if (response.data.success == "1") {  // 若成功安裝→放行
+              let title = response.data.result.title;
+              document.title = title;
+            }else{
+              next({path: '/install'});
+            }
+          }).catch(function (error){
+            alert(error);
+          });
+        }
 
     });
 

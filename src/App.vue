@@ -20,8 +20,8 @@
   <div class="modal-dialog modal-xl">
     <div class="modal-content bg-secondary">
       <!-- Modal Header -->
-      <div class="col-sm-12">
-        <button type="button" class="close" data-dismiss="modal">X</button>
+      <div class="col-sm-12" style="position: sticky;top: 0;z-index: 1000;">
+        <button type="button" class="close" data-dismiss="modal" style="color:red;">X</button>
       </div>
 
       <!-- Modal body -->

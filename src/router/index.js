@@ -8,6 +8,7 @@ import loginView from '../views/LoginView.vue'
 import EditedView from '../views/EditedView.vue'
 import ArticleView from '../views/ArticleView.vue'
 import InstallView from '../views/InstallView.vue'
+import CloseModalView from '../views/CloseModalView.vue'
 
 const routes = [
   {
@@ -17,7 +18,8 @@ const routes = [
       default: HomeView,
       Header:HeaderView,
       //Footer:FooterView,
-      RightList:RightListView
+      RightList:RightListView,
+      modal:CloseModalView
     },
     meta:{ installedAuth: true}
   },

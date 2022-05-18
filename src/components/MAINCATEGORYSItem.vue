@@ -38,6 +38,7 @@ export default {
   SearchCATEGORY(CATEGORY){
     let me = this;
     let state = me.useStore.state;
+    state.homeloadflag = true;
     state.list = [];
  
     state.SEARCHTYPE = "CATEGORY";
@@ -48,6 +49,7 @@ export default {
     data.append('KEYWORD', state.KEYWORD);
     
     me.conection(data,function(response){
+     state.homeloadflag = false;
      let success = response.data.success;
      if (success == "1"){
          let result = response.data.result;

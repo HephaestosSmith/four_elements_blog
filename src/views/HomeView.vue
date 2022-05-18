@@ -56,7 +56,7 @@
          <div style="height:20px"/>
       </div>
     </div>
-    <div class="row" v-if="loading">
+    <div class="row" v-if="this.useStore.state.homeloadflag">
       <div class="col d-flex justify-content-center">
         <div class="spinner-grow text-primary m-5" role="status">
           <span class="sr-only">Loading...</span>
@@ -81,6 +81,11 @@
         </div>
       </div>
     </div>
+    <div class="rounded text-wrap article row"  v-if="noData()">
+             <div class="col-12 text-white" style="text-align: center;font-weight: bold;">
+               查無資料
+             </div>
+    </div>
 </template>
 <script>
 import { useStore } from 'vuex'
@@ -97,7 +102,6 @@ export default {
           editor: '',
           editorData: '',
           editorConfig: '' ,
-          loading:true,
           SUBCATEGORY:'',
           SUBCATEGORYS:[],
           MAINCATEGORY:'',
@@ -125,7 +129,7 @@ export default {
      me.useStore = useStore();
      me.useStore.state.list = [];
      me.list = me.useStore.state.list;
-     me.loading = true;
+     me.useStore.state.homeloadflag = true;
      me.editor = me.useStore.state.CKEditor;
      me.editorConfig = me.useStore.state.editorConfig;
      me.Logined();
@@ -168,7 +172,7 @@ export default {
       me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
-           me.loading = false;
+           me.useStore.state.homeloadflag = false;
            let result = response.data.result;
            if(postflag){
                state.list = state.list.reverse();
@@ -185,7 +189,7 @@ export default {
        }
        else{
           let msg =response.data.msg;
-          me.loading = false;
+          me.useStore.state.homeloadflag = false;
           alert(msg);
        }
       });
@@ -231,8 +235,8 @@ export default {
       let me = this;
       let state = me.useStore.state;
       if (window.scrollY + document.documentElement.clientHeight >= document.body.scrollHeight - 5) {
-          if (!me.loading & !state.noDataFlag){
-              me.loading = true;
+          if (!me.useStore.state.homeloadflag & !state.noDataFlag){
+              me.useStore.state.homeloadflag = true;
               me.getAticle(false);
           }
       }
@@ -258,7 +262,7 @@ export default {
        }
        else{
           let msg =response.data.msg;
-          me.loading = false;
+          me.useStore.state.homeloadflag = false;
           alert(msg);
        }
       })
@@ -285,7 +289,7 @@ export default {
        }
        else{
           let msg =response.data.msg;
-          me.loading = false;
+          me.useStore.state.homeloadflag = false;
           alert(msg);
        }
       })
@@ -315,6 +319,14 @@ export default {
           alert(msg);
        }
       })
+  },
+  noData(){
+    let state = this.useStore.state;
+    if(state.list.length == 0 && !state.homeloadflag){
+      return true;
+    }else{
+      return false;
+    }
   }
   }
 }

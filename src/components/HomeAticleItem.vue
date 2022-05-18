@@ -1,5 +1,5 @@
 <template>
-    <router-link style="text-decoration:none;" class="rounded text-wrap article text-white row" :to="{ name: 'article', params: { UUID: item.UUID } }" :key="item.UUID" data-toggle="modal" data-target="#ModalView">
+    <router-link style="text-decoration:none;" class="rounded text-wrap article text-white row" @click="loading(item.UUID)" :to="{ name: 'article', params: { UUID: item.UUID } }" :key="item.UUID" data-toggle="modal" data-target="#ModalView">
       <div class="col">
            <div class="row">
                 <div class="col-6">
@@ -37,6 +37,7 @@
       </router-link><!--</div>-->
 </template>
 <script>
+import { useStore } from 'vuex'
 import Prism from "prismjs";
 import 'prismjs/components/prism-bash'
 import 'prismjs/components/prism-javascript'
@@ -55,7 +56,8 @@ export default {
   },
   data() {
       return {
-          isLongContent:false
+          isLongContent:false,
+          tempuuid:''
       };
   },
   watch:{
@@ -66,7 +68,9 @@ export default {
        }
   },
   mounted() {
-       this.calculateHeight();
+       let me = this;
+       me.useStore = useStore();
+       me.calculateHeight();
   },
   methods:{
   calculateHeight(){
@@ -80,6 +84,12 @@ export default {
   },
   PrismView(){
       Prism.highlightAll(); 
+  },
+  loading(uuid){
+      let me = this;
+      if(uuid != me.$route.params.UUID){
+        me.useStore.state.modalloadflag = true;
+      }
   }
   }
 }

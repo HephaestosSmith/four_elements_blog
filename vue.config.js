@@ -4,7 +4,6 @@ const CKEditorWebpackPlugin = require( '@ckeditor/ckeditor5-dev-webpack-plugin' 
 const { styles } = require( '@ckeditor/ckeditor5-dev-utils' );
 
 module.exports = defineConfig({
-  indexPath:"index.php",
   parallel: false,
   transpileDependencies: [
        /ckeditor5-[^/\\]+[/\\]src[/\\].+\.js$/,

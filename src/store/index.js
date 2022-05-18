@@ -57,6 +57,10 @@ export default createStore({
     noDataFlag:false,
     SEARCHTYPE:'default',
     Createflag:false,
+    modalloadflag:true,
+    homeloadflag:true,
+    MAINCATEGORYS:[],
+    SUBCATEGORYS:[],
     CKEditor:ClassicEditor,
     editorConfig: {
       plugins: [
