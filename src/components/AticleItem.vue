@@ -11,7 +11,7 @@
                      </a>
                      <div class="dropdown-menu">
                        <router-link class="dropdown-item btn"  :to="{ name: 'edited', params: { UUID:uuid } }">編輯</router-link>
-                       <button class="dropdown-item btn" @click="Delete(UUID)">刪除</button>
+                       <button class="dropdown-item btn" @click="Delete(uuid)">刪除</button>
                      </div>
                   </a>
                 </div>

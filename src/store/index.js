@@ -37,6 +37,16 @@ import mention from '@ckeditor/ckeditor5-mention/src/mention'
 
 //
 import Highlight from '@ckeditor/ckeditor5-highlight/src/highlight';
+import Base64UploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/base64uploadadapter';
+import Image from '@ckeditor/ckeditor5-image/src/image';
+import ImageToolbar from '@ckeditor/ckeditor5-image/src/imagetoolbar';
+import ImageCaption from '@ckeditor/ckeditor5-image/src/imagecaption';
+import ImageStyle from '@ckeditor/ckeditor5-image/src/imagestyle';
+import ImageResize from '@ckeditor/ckeditor5-image/src/imageresize';
+import LinkImage from '@ckeditor/ckeditor5-link/src/linkimage';
+import ImageInsert from '@ckeditor/ckeditor5-image/src/imageinsert';
+import SimpleUploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/simpleuploadadapter';
+
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL='/api'
@@ -63,6 +73,25 @@ export default createStore({
     SUBCATEGORYS:[],
     CKEditor:ClassicEditor,
     editorConfig: {
+      simpleUpload: {
+            // The URL that the images are uploaded to.
+            uploadUrl: '../api/controllers/upload.php',
+
+            // Enable the XMLHttpRequest.withCredentials property.
+            withCredentials: false,
+
+            // Headers sent along with the XMLHttpRequest to the upload server.
+            headers: {
+                'X-CSRF-TOKEN': 'CSRF-Token',
+                Authorization: 'Bearer <JSON Web Token>'
+            }
+        },
+      image: {
+        toolbar: [ 
+          'imageStyle:inline',
+          'imageStyle:block',
+          'imageStyle:side','toggleImageCaption', 'imageTextAlternative' ]
+      },
       plugins: [
         heading,
         bold,
@@ -85,7 +114,16 @@ export default createStore({
         horizontalLine,
         mediaEmbed,
         mention,
-        Highlight
+        Highlight,
+        Base64UploadAdapter,
+        Image,
+        ImageToolbar,
+        ImageCaption,
+        ImageStyle,
+        ImageResize,
+        LinkImage,
+        ImageInsert,
+        SimpleUploadAdapter
       ],
       toolbar: {
         items: [
@@ -123,8 +161,18 @@ export default createStore({
           'outdent',
           'indent',
           '|',
+          'imageinsert',
           'mediaEmbed', // 插入媒體
-          'highlight'
+          'highlight',
+          '|',
+          'imageStyle:inline',
+          'imageStyle:block',
+          'imageStyle:side',
+          '|',
+          'toggleImageCaption',
+          'imageTextAlternative',
+          '|',
+          'linkImage'
         ]
       },
       mention: {
