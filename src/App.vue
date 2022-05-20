@@ -20,7 +20,7 @@
   <div class="modal-dialog modal-xl">
     <div class="modal-content bg-secondary">
       <!-- Modal Header -->
-      <div class="col-sm-12" style="position: sticky;top: 0;z-index: 1000;">
+      <div class="col-sm-12" style="position: sticky;top: 10px;z-index: 1000;">
         <button type="button" class="close" data-dismiss="modal" style="color:red;">X</button>
       </div>
 
@@ -50,7 +50,8 @@ export default {
     return {
       reload: this.reload,      
       conection: this.conection,
-      modalshow:this.modalshow
+      modalshow:this.modalshow,
+      PrismView:this.PrismView
     }
   },
   data() {
@@ -107,4 +108,5 @@ img{
 }
 @import './css/ck.css';
 @import "./css/prism-tomorrow.css"; // you can change
+@import "prismjs/themes/prism-tomorrow.css"; // you can change
 </style>

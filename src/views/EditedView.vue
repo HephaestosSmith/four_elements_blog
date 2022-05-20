@@ -43,7 +43,7 @@
                </div>
              </div>
              <div class="col-sm-2" style="margin-top: 5px;">
-             <a class="btn btn-primary" @click="PrismView()"  style="height:35px; margin-right: 5px;">預覽</a>
+             <a class="btn btn-primary" @click="this.useStore.commit('PrismView')"  style="height:35px; margin-right: 5px;">預覽</a>
              <a class="btn btn-primary" @click="update()"  style="height:35px;">修改</a>
              </div>
          </div>
@@ -111,16 +111,6 @@
 </template>
 <script>
 import { useStore } from 'vuex'
-import Prism from "prismjs";
-import 'prismjs/components/prism-bash'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-json'
-import 'prismjs/components/prism-liquid'
-import 'prismjs/components/prism-markdown'
-import 'prismjs/components/prism-markup-templating'
-import 'prismjs/components/prism-php'
-import 'prismjs/components/prism-scss'
-import "prismjs/themes/prism-tomorrow.css"; // you can change
 
 export default {
   inject: [
@@ -319,9 +309,6 @@ export default {
       }else{
           return false;
       }
-  },  
-  PrismView(){
-      Prism.highlightAll(); 
   }
   }
 }

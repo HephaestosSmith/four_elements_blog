@@ -38,15 +38,6 @@
 </template>
 <script>
 import { useStore } from 'vuex'
-import Prism from "prismjs";
-import 'prismjs/components/prism-bash'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-json'
-import 'prismjs/components/prism-liquid'
-import 'prismjs/components/prism-markdown'
-import 'prismjs/components/prism-markup-templating'
-import 'prismjs/components/prism-php'
-import 'prismjs/components/prism-scss'
 
 export default {
   props: {
@@ -80,10 +71,7 @@ export default {
           } else {
             this.isLongContent = false
           }
-          this.PrismView();
-  },
-  PrismView(){
-      Prism.highlightAll(); 
+          this.useStore.commit('PrismView');
   },
   loading(uuid){
       let me = this;

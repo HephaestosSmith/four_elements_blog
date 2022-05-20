@@ -1,6 +1,15 @@
 import { createStore } from 'vuex'
 import axios from 'axios'
 import Cookies from 'vue-cookie'
+
+import Prism from "prismjs";
+import 'prismjs/components/prism-bash'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-json'
+import 'prismjs/components/prism-liquid'
+import 'prismjs/components/prism-markdown'
+import 'prismjs/components/prism-markup-templating'
+import 'prismjs/components/prism-php'
 //編輯器樣式
 import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor'
 import '@ckeditor/ckeditor5-build-classic/build/translations/zh'
@@ -236,6 +245,9 @@ export default createStore({
           evtObj.keyCode = keyCode;
           el.fireEvent('on' + evtType, evtObj);
       }
+   },
+   PrismView(){
+    Prism.highlightAll(); 
    }
   },
   actions: {
