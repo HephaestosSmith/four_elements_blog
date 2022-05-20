@@ -106,7 +106,5 @@ img{
   max-height: 100%;
   max-width: 100%;
 }
-@import './css/ck.css';
-@import "./css/prism-tomorrow.css"; // you can change
-@import "prismjs/themes/prism-tomorrow.css"; // you can change
+@import './css/custom.css';
 </style>

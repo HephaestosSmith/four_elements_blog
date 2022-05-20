@@ -55,6 +55,8 @@ import ImageResize from '@ckeditor/ckeditor5-image/src/imageresize';
 import LinkImage from '@ckeditor/ckeditor5-link/src/linkimage';
 import ImageInsert from '@ckeditor/ckeditor5-image/src/imageinsert';
 import SimpleUploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/simpleuploadadapter';
+import 'prismjs/components/prism-scss'
+import "prismjs/themes/prism-tomorrow.css"; // you can change
 
 
 axios.defaults.withCredentials = true;
