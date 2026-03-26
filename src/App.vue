@@ -1,47 +1,37 @@
 <template>
-<div class="container-fluid app-shell" id="main" :key="display">
-  <div class="row app-header sticky-top" id="Header">
-    <div class="col-12">
-     <router-view name="Header"/>
+  <div class="container-fluid app-shell" id="main" :key="display">
+    <div class="row app-header sticky-top" id="Header">
+      <div class="col-12">
+        <router-view name="Header"></router-view>
+      </div>
     </div>
-  </div>
-  <div class="row app-layout">
-    <div class="d-none d-md-block col-md-2 bd-toc"></div>
-    <div class="col-md-8 main">
-       <router-view/>
-    </div>
-    <div class="d-none d-xl-block col-xl-2 bd-toc">
-       <router-view name="RightList" />
-    </div>
-    
-<!-- The Modal -->
-<div class="modal fade" id="ModalView">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content bg-secondary">
-      <!-- Modal Header -->
-      <div class="col-sm-12 sticky-10">
-        <button type="button" class="close text-danger" data-dismiss="modal">X</button>
+
+    <div class="row app-layout">
+      <div class="d-none d-md-block col-md-2 bd-toc"></div>
+      <div class="col-md-8 main">
+        <router-view></router-view>
+      </div>
+      <div class="d-none d-xl-block col-xl-2 bd-toc">
+        <router-view name="RightList"></router-view>
       </div>
 
-    <div class="modal fade" id="ModalView">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content app-modal-content">
-          <div class="col-sm-12 sticky-10 modal-close-row">
-            <button type="button" class="close text-danger" data-dismiss="modal">X</button>
-          </div>
+      <div class="modal fade" id="ModalView">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content app-modal-content">
+            <div class="col-sm-12 sticky-10 modal-close-row">
+              <button type="button" class="close text-danger" data-dismiss="modal">X</button>
+            </div>
 
-          <div class="modal-body modal-body-scrollable">
-           <router-view name="modal"/>
+            <div class="modal-body modal-body-scrollable">
+              <router-view name="modal"></router-view>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
-  </div>
-  <FooterView />
 
-</div>
+    <FooterView></FooterView>
+  </div>
 </template>
 <script>
 import { useStore } from 'vuex'
@@ -95,17 +85,6 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-@import './css/variables.scss';
-#Footer{
-  background-color: $bg-color;
-  color: $text-muted-color;
-  text-align: left;
-}
-.article {
-  background-color: rgba(245, 245, 245, 0.15);
-  margin-top: 1rem;
-  padding: 1rem 1rem 1rem 0.5rem;
-}
 .ck-editor__editable {
     min-height: 300px;
 }
