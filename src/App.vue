@@ -15,11 +15,17 @@
         <router-view name="RightList"></router-view>
       </div>
 
-      <div class="modal fade" id="ModalView">
+      <div
+        id="ModalView"
+        class="app-modal-mask"
+        :class="{ show: modalVisible }"
+        tabindex="-1"
+        @keydown.esc="modalVisible = false"
+      >
         <div class="modal-dialog modal-xl">
           <div class="modal-content app-modal-content">
             <div class="col-sm-12 sticky-10 modal-close-row">
-              <button type="button" class="close text-danger" data-dismiss="modal">X</button>
+              <button type="button" class="close text-danger" @click="modalVisible = false">X</button>
             </div>
 
             <div class="modal-body modal-body-scrollable">
@@ -35,7 +41,6 @@
 </template>
 <script>
 import { useStore } from 'vuex'
-import { Modal } from "bootstrap"
 import FooterView from './views/FooterView.vue'
 
 export default {
@@ -52,7 +57,8 @@ export default {
   },
   data() {
     return {
-      display: 0
+      display: 0,
+      modalVisible: false
      }
   },
   created() {
@@ -76,10 +82,7 @@ export default {
       });
     },
     modalshow(){
-      let ModalView = new Modal(document.getElementById("ModalView"))
-      if(document.getElementsByClassName("show").length == 0){
-         ModalView.show();
-      }
+      this.modalVisible = true;
     }
   }
 }

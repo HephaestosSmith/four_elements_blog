@@ -1,9 +1,11 @@
 import { createApp } from 'vue'
+import PrimeVue from 'primevue/config'
 import App from './App.vue'
 import store from './store'
 import router from './router'
-import "bootstrap"
-import "bootstrap/scss/bootstrap.scss"
+import 'primevue/resources/themes/lara-dark-blue/theme.css'
+import 'primevue/resources/primevue.min.css'
+import 'primeicons/primeicons.css'
 import './css/custom.css'
 import axios from 'axios'
 import Cookies from 'vue-cookie'
@@ -16,25 +18,25 @@ const app = createApp(App)
 router.install
 
 router.beforeEach((to, from, next) => {
-      if (to.meta.installAuth) {  // 若要前往的頁面具有installedAuth的話，就不會放行
+      if (to.meta.installAuth) {
         let data = new URLSearchParams();
         data.append('name',to.name);
         data.append('param',JSON.stringify(to.params));
         axios.post('/controllers/install.php',data).then((response) => {
-          if (response.data.success == "1") {  // 若成功安裝→放行
+          if (response.data.success == "1") {
             next({path: '/'});
           }
           else{
-            next();                            // 若前往安裝頁面→放行
+            next();
           }
         });
-      }else if (to.meta.loginAuth) {  // 若要前往的頁面具有requiresAuth的話，就不會放行
+      }else if (to.meta.loginAuth) {
         let data = new URLSearchParams();
         data.append('commandType', "check");
         data.append('username', Cookies.get('username'));
         data.append('TOKEN', Cookies.get('TOKEN'));
-        axios.post('/controllers/Command.php',data).then((response) => {  // 因不是在vue下執行此元件，所以此處的this.$http使用axios替代
-          if (response.data.success == "0") {  // 若成功登入→放行；若非登入狀態，則會跳回登入頁面
+        axios.post('/controllers/Command.php',data).then((response) => {
+          if (response.data.success == "0") {
             Cookies.delete('username');
             Cookies.delete('TOKEN');
             next();
@@ -49,8 +51,8 @@ router.beforeEach((to, from, next) => {
         data.append('username', Cookies.get('username'));
         data.append('TOKEN', Cookies.get('TOKEN'));
         data.append('UUID',to.params.UUID)
-        axios.post('/controllers/Command.php',data).then((response) => {  // 因不是在vue下執行此元件，所以此處的this.$http使用axios替代
-          if (response.data.success == "1") {  // 若成功登入→放行；若非登入狀態，則會跳回登入頁面
+        axios.post('/controllers/Command.php',data).then((response) => {
+          if (response.data.success == "1") {
             next();
           }else{
             next({path: '/'});
@@ -59,14 +61,14 @@ router.beforeEach((to, from, next) => {
       }else{
         next();
       }
-      if (to.meta.installedAuth) {  // 若要前往的頁面具有installedAuth的話，就不會放行
+      if (to.meta.installedAuth) {
           let data = new URLSearchParams();
           data = new URLSearchParams();
           data.append('commandType',"getTitle");
           data.append('name',to.name);
           data.append('param',JSON.stringify(to.params));
           axios.post('/controllers/Command.php',data).then((response) => {
-            if (response.data.success == "1") {  // 若成功安裝→放行
+            if (response.data.success == "1") {
               let title = response.data.result.title;
               document.title = title;
             }else{
@@ -79,5 +81,9 @@ router.beforeEach((to, from, next) => {
 
     });
 
-app.use(router).use(store).use(CKEditor).mount('#app');
-
+app
+  .use(PrimeVue, { ripple: true })
+  .use(router)
+  .use(store)
+  .use(CKEditor)
+  .mount('#app');
