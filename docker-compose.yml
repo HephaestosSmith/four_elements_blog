@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: blog_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: find003paw203
+      MYSQL_DATABASE: blog_db
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: blog_php
+    ports:
+      - "80:80"
+    volumes:
+      - ./public:/var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=find003paw203
+      - MYSQL_DB=blog_db
+
+volumes:
+  mysql_data:
