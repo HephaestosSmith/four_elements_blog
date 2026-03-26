@@ -39,7 +39,6 @@ import Button from 'primevue/button'
 
 export default {
   inject: [
-     'reload',
      'conection'
      ],
   data() {

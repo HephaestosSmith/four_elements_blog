@@ -12,8 +12,6 @@ axios.defaults.baseURL='/api'
 
 const app = createApp(App)
 
-router.install
-
 router.beforeEach((to, from, next) => {
       if (to.meta.installAuth) {
         let data = new URLSearchParams();
