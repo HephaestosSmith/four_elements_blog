@@ -1,40 +1,29 @@
 <template>
-    <router-link style="text-decoration:none;" class="rounded text-wrap article text-white row" @click="loading(item.UUID)" :to="{ name: 'article', params: { UUID: item.UUID } }" :key="item.UUID" data-toggle="modal" data-target="#ModalView">
-      <div class="col">
-           <div class="row">
-                <div class="col-6">
-                   {{ item.CREATEDATE }}
-                </div>
-                <div class="col-6 text-right">
-                   <!--<a class="dropdown"  v-if="loginstatus()">
-                     <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" style="height: 35px;">
-                     </a>
-                     <div class="dropdown-menu">
-                       <router-link class="dropdown-item btn"  :to="{ name: 'edited', params: { UUID: item.UUID } }" data-toggle="modal" data-target="#ModalView">編輯</router-link>
-                       <button class="dropdown-item btn" @click="Delete(item.UUID)">刪除</button>
-                     </div>
-                  </a>-->
-                </div>
-           </div>
-           <div style="height:8px;"/>
-           <div class="row">
-                <div class="col ck-content" v-html= item.CONTENT style="max-height:200px; overflow: hidden;" ref="content">
-                </div>
-           </div>
-           <div class="row" v-show="isLongContent">
-              <div class="col ck-content text-black" style="color: deepskyblue;-webkit-text-stroke: medium; text-shadow: 1px 2px black;" >... MORE</div>
-           </div>
-           <hr>
-           <div class="row">
-              <div class="col-7">
-                    發文時間:{{ item.CREATETIME }}
-              </div>
-              <div class="col-5 text-right">
-                  作者: {{item.AUTHOR}}
-              </div>
-           </div>
-          </div>
-      </router-link><!--</div>-->
+  <router-link
+    class="article block rounded-2xl border border-slate-800/80 bg-slate-900/70 p-4 text-slate-100 no-underline transition hover:-translate-y-0.5 hover:border-indigo-500/60"
+    @click="loading(item.UUID)"
+    :to="{ name: 'article', params: { UUID: item.UUID } }"
+    :key="item.UUID"
+  >
+    <div class="mb-2 flex items-center justify-between text-sm text-slate-400">
+      <div>{{ item.CREATEDATE }}</div>
+    </div>
+
+    <div class="spacer-8"></div>
+
+    <div class="ck-content max-h-200 overflow-hidden" v-html="item.CONTENT" ref="content"></div>
+
+    <div class="mt-2" v-show="isLongContent">
+      <div class="text-sm font-semibold text-indigo-300">... MORE</div>
+    </div>
+
+    <hr class="my-3 border-slate-700">
+
+    <div class="flex items-center justify-between text-xs text-slate-400">
+      <div>發文時間:{{ item.CREATETIME }}</div>
+      <div>作者: {{item.AUTHOR}}</div>
+    </div>
+  </router-link>
 </template>
 <script>
 import { useStore } from 'vuex'

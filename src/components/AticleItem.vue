@@ -1,96 +1,34 @@
 <template>
-      <div class="rounded text-wrap article text-white row" v-if="!useStore.state.modalloadflag">
-      <div class="col" :key = uuid>
-           <div class="row">
-                <div class="col-6">
-                  {{ article.CREATEDATE }}
-                </div>
-                <div class="col-6 text-right">
-                   <a class="dropdown"  v-if="loginstatus()">
-                     <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" style="height: 35px;">
-                     </a>
-                     <div class="dropdown-menu">
-                       <router-link class="dropdown-item btn"  :to="{ name: 'edited', params: { UUID:uuid } }">編輯</router-link>
-                       <button class="dropdown-item btn" @click="Delete(uuid)">刪除</button>
-                     </div>
-                  </a>
-                </div>
-           </div>
-           <div style="height:8px;"/>
-           <div class="row">
-                <div class="col ck-content" v-html= article.CONTENT>
-                </div>
-           </div>
-           <hr>
-           <div class="row">
-              <div class="col-7">
-                    發文時間:{{ article.CREATETIME }}
-              </div>
-              <div class="col-5 text-right">
-                  作者: {{article.AUTHOR}}
-              </div>
-           </div>
+  <div class="article rounded-2xl border border-slate-800/80 bg-slate-900/80 p-4 text-slate-100" v-if="!useStore.state.modalloadflag">
+    <div :key="uuid">
+      <div class="flex items-center justify-between text-sm text-slate-400">
+        <div>{{ article.CREATEDATE }}</div>
+        <div>
+          <div class="relative" v-if="loginstatus()">
+            <button class="rounded-lg border border-slate-700 px-3 py-1 text-xs text-slate-300">操作</button>
+            <div class="dropdown-menu static-dropdown mt-2 rounded-xl border border-slate-700 bg-slate-900 p-1">
+              <router-link class="dropdown-item btn" :to="{ name: 'edited', params: { UUID:uuid } }">編輯</router-link>
+              <button class="dropdown-item btn" @click="Delete(uuid)">刪除</button>
+            </div>
           </div>
+        </div>
       </div>
-    <div class="row">
-      <div class="col">
-         <div style="height:20px"/>
-      </div>
-    </div>
-    <div class="row" v-if="useStore.state.modalloadflag">
-      <div class="col d-flex justify-content-center">
-        <div class="spinner-grow text-primary m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-success m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-danger m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-warning m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-info m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-light m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-dark m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <!--
-         
-        <div class="spinner-border text-primary m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-primary m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-secondary m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-success m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-danger m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-warning m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-info m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-light m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-dark m-5" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>-->
+
+      <div class="spacer-8"></div>
+      <div class="ck-content" v-html="article.CONTENT"></div>
+      <hr class="my-3 border-slate-700">
+      <div class="flex items-center justify-between text-xs text-slate-400">
+        <div>發文時間:{{ article.CREATETIME }}</div>
+        <div>作者: {{article.AUTHOR}}</div>
       </div>
     </div>
+  </div>
+
+  <div class="py-6" v-if="useStore.state.modalloadflag">
+    <div class="flex justify-center">
+      <span class="loading loading-dots loading-lg text-indigo-400"></span>
+    </div>
+  </div>
 </template>
 <script>
 import { useStore } from 'vuex'
@@ -171,6 +109,7 @@ export default {
       }else{
        me.article = articledata [0];
        state.modalloadflag= false;
+       me.modalshow();
       }
   },
   Delete(UUID){
@@ -180,11 +119,11 @@ export default {
       let me = this;
       let useStore = me.useStore;
       let state = me.useStore.state;
-      
+
       let data = new URLSearchParams();
       data.append('commandType', "delete");
       data.append('UUID', UUID);
-      
+
       me.conection(data,function(response){
        let success = response.data.success;
        if (success == "1"){
@@ -204,3 +143,15 @@ export default {
   }
 }
 </script>
+<style scoped>
+.static-dropdown {
+  position: absolute;
+  right: 0;
+  min-width: 120px;
+  display: none;
+}
+
+.relative:hover .static-dropdown {
+  display: block;
+}
+</style>

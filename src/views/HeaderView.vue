@@ -1,36 +1,33 @@
 <template>
-  <!--<div class="col-12">
-    <a id="header">四元素部落格</a>
-    <p><router-link to="/" class="btn btn-primary btn-xs" role="button">Home</router-link>
-       | <router-link to="/about" class="btn btn-primary btn-xs" role="button">about</router-link></p>
-  </div>-->
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark" role="navigation">
-  <!-- Brand -->
-  <router-link class="navbar-brand" to="/" @click="home()">{{HomeName}}</router-link>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-  <!-- Links -->
-  <ul class="navbar-nav mr-auto">
-    <li class="nav-item">
-      <router-link class="nav-link" to="/" @click="home()" v-if="installflag">首頁</router-link>
-    </li>
-    <HeaderMAINCATEGORYSItem/>
-    <li class="nav-item" v-if="!loginstatus() && installflag">
-      <router-link class="nav-link" to="/login"  data-toggle="modal" data-target="#ModalView">登入</router-link>
-    </li>
-    <li class="nav-item" v-if="loginstatus() && installflag">
-      <router-link class="nav-link"  to="/" @click="logout()">登出</router-link>
-    </li>
-  </ul>
-  <div class="form-inline my-2 my-lg-0" v-if="installflag">
-  <input class="form-control mr-sm-2" type="search" placeholder="輸入關鍵字" v-model="SearchData" >
-  <button class="btn btn-outline-success " @click="HeaderSearch(true)" >查詢</button>
-  </div>
-  </div>
-</nav>
+  <nav class="mx-auto mb-5 mt-4 max-w-7xl rounded-2xl border border-slate-800/80 bg-slate-950/70 px-4 py-3 shadow-2xl backdrop-blur">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex items-center gap-4">
+        <router-link class="text-xl font-bold text-slate-100 no-underline" to="/" @click="home()">{{ HomeName }}</router-link>
+        <ul class="m-0 flex list-none items-center gap-2 p-0">
+          <li>
+            <router-link class="rounded-lg px-3 py-2 text-slate-300 transition hover:bg-indigo-500/20 hover:text-white" to="/" @click="home()" v-if="installflag">首頁</router-link>
+          </li>
+          <HeaderMAINCATEGORYSItem />
+          <li v-if="!loginstatus() && installflag">
+            <router-link class="rounded-lg px-3 py-2 text-slate-300 transition hover:bg-indigo-500/20 hover:text-white" to="/login">登入</router-link>
+          </li>
+          <li v-if="loginstatus() && installflag">
+            <router-link class="rounded-lg px-3 py-2 text-slate-300 transition hover:bg-indigo-500/20 hover:text-white" to="/" @click="logout()">登出</router-link>
+          </li>
+        </ul>
+      </div>
+
+      <div class="flex items-center gap-2" v-if="installflag">
+        <input
+          class="w-56 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none ring-indigo-400 transition focus:ring"
+          type="search"
+          placeholder="輸入關鍵字"
+          v-model="SearchData"
+        >
+        <button class="rounded-xl bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400" @click="HeaderSearch(true)">查詢</button>
+      </div>
+    </div>
+  </nav>
 </template>
 
 <script>
@@ -40,7 +37,6 @@ import Cookies from 'vue-cookie'
 
 export default {
   inject: [
-     'reload',
      'conection'
      ],
   data() {
@@ -77,7 +73,7 @@ export default {
 
          data = new URLSearchParams();
          data.append('commandType', "check");
-         
+
          me.conection(data,function(response){
           let success = response.data.success;
           if (success == "1"){
@@ -120,7 +116,7 @@ export default {
         me.SearchData = '';
         state.SEARCHTYPE = "default";
       }
-      
+
       if(me.SearchData.length == 0){
         state.SEARCHTYPE = "default";
       }else{
@@ -134,7 +130,7 @@ export default {
       data.append('commandType', "getAticle");
       data.append('SEARCHTYPE', state.SEARCHTYPE);
       data.append('KEYWORD', state.KEYWORD);
-      
+
       me.conection(data,function(response){
        state.homeloadflag = false;
        let success = response.data.success;
@@ -150,14 +146,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.navbar-nav li:hover>.dropdown-menu {
-  display: block;
-  margin-top: 0px;
-}
-.navbar-nav li .dropdown-menu .dropright:hover>.dropdown-menu{
-  display: block;
-  margin-left: -5px;
-}
-</style>
