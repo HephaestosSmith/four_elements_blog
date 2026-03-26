@@ -11,6 +11,10 @@
   --success: #22c55e;
 }
 
+html, body {
+  font-family: Inter, "Noto Sans TC", system-ui, -apple-system, sans-serif;
+}
+
 body.app-body {
   background: radial-gradient(circle at top, #17233a 0%, var(--bg-main) 45%);
   color: var(--text-primary);

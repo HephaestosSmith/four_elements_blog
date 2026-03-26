@@ -1,36 +1,36 @@
 <template>
-  <div class="container-fluid app-shell" id="main" :key="display">
-    <div class="row app-header sticky-top" id="Header">
-      <div class="col-12">
-        <router-view name="Header"></router-view>
-      </div>
+  <div id="main" :key="display" class="min-h-screen bg-slate-950 text-slate-100">
+    <div id="Header" class="sticky top-0 z-40">
+      <router-view name="Header"></router-view>
     </div>
 
-    <div class="row app-layout">
-      <div class="d-none d-md-block col-md-2 bd-toc"></div>
-      <div class="col-md-8 main">
+    <div class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-3 pb-8 md:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[220px_minmax(0,1fr)_260px]">
+      <aside class="hidden md:block"></aside>
+
+      <main class="min-w-0">
         <router-view></router-view>
-      </div>
-      <div class="d-none d-xl-block col-xl-2 bd-toc">
+      </main>
+
+      <aside class="hidden xl:block">
         <router-view name="RightList"></router-view>
-      </div>
+      </aside>
+    </div>
 
-      <div
-        id="ModalView"
-        class="app-modal-mask"
-        :class="{ show: modalVisible }"
-        tabindex="-1"
-        @keydown.esc="modalVisible = false"
-      >
-        <div class="modal-dialog modal-xl">
-          <div class="modal-content app-modal-content">
-            <div class="col-sm-12 sticky-10 modal-close-row">
-              <button type="button" class="close text-danger" @click="modalVisible = false">X</button>
-            </div>
+    <div
+      id="ModalView"
+      class="app-modal-mask"
+      :class="{ show: modalVisible }"
+      tabindex="-1"
+      @keydown.esc="modalVisible = false"
+    >
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content app-modal-content rounded-2xl border border-slate-700 bg-slate-900">
+          <div class="modal-close-row px-4 pt-3 text-right">
+            <button type="button" class="rounded-lg border border-slate-700 px-3 py-1 text-sm text-slate-300 transition hover:bg-slate-800" @click="modalVisible = false">關閉</button>
+          </div>
 
-            <div class="modal-body modal-body-scrollable">
-              <router-view name="modal"></router-view>
-            </div>
+          <div class="modal-body modal-body-scrollable px-2 pb-4">
+            <router-view name="modal"></router-view>
           </div>
         </div>
       </div>

@@ -3,9 +3,6 @@ import PrimeVue from 'primevue/config'
 import App from './App.vue'
 import store from './store'
 import router from './router'
-import 'primevue/resources/themes/lara-dark-blue/theme.css'
-import 'primevue/resources/primevue.min.css'
-import 'primeicons/primeicons.css'
 import './css/custom.css'
 import axios from 'axios'
 import Cookies from 'vue-cookie'
@@ -82,7 +79,6 @@ router.beforeEach((to, from, next) => {
     });
 
 app
-  .use(PrimeVue, { ripple: true })
   .use(router)
   .use(store)
   .use(CKEditor)
