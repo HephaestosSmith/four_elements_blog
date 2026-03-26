@@ -1,6 +1,6 @@
 <?php 
-include './api/controllers/ReturnResult.php';
-$path = './api/controllers/Conection.php';
+include './controllers/ReturnResult.php';
+$path = './controllers/Conection.php';
 $title = '';
 
 if (file_exists($path))
