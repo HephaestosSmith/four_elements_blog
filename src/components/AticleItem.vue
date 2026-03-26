@@ -7,7 +7,7 @@
                 </div>
                 <div class="col-6 text-right">
                    <a class="dropdown"  v-if="loginstatus()">
-                     <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" style="height: 35px;">
+                     <a class="btn btn-secondary dropdown-toggle h-35" data-toggle="dropdown">
                      </a>
                      <div class="dropdown-menu">
                        <router-link class="dropdown-item btn"  :to="{ name: 'edited', params: { UUID:uuid } }">編輯</router-link>
@@ -16,7 +16,7 @@
                   </a>
                 </div>
            </div>
-           <div style="height:8px;"/>
+           <div class="spacer-8"></div>
            <div class="row">
                 <div class="col ck-content" v-html= article.CONTENT>
                 </div>
@@ -34,7 +34,7 @@
       </div>
     <div class="row">
       <div class="col">
-         <div style="height:20px"/>
+         <div class="spacer-20"></div>
       </div>
     </div>
     <div class="row" v-if="useStore.state.modalloadflag">

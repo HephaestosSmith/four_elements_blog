@@ -26,8 +26,8 @@
     </li>
   </ul>
   <div class="form-inline my-2 my-lg-0" v-if="installflag">
-  <input class="form-control mr-sm-2" type="search" placeholder="輸入關鍵字" v-model="SearchData" >
-  <button class="btn btn-outline-success " @click="HeaderSearch(true)" >查詢</button>
+  <InputText class="mr-sm-2 search-input" type="search" placeholder="輸入關鍵字" v-model="SearchData" />
+  <Button class="search-button" label="查詢" severity="contrast" @click="HeaderSearch(true)" />
   </div>
   </div>
 </nav>
@@ -37,6 +37,8 @@
 import HeaderMAINCATEGORYSItem from '../components/HeaderMAINCATEGORYSItem.vue'
 import { useStore } from 'vuex'
 import Cookies from 'vue-cookie'
+import InputText from 'primevue/inputtext'
+import Button from 'primevue/button'
 
 export default {
   inject: [
@@ -51,7 +53,9 @@ export default {
       };
   },
   components: {
-    HeaderMAINCATEGORYSItem
+    HeaderMAINCATEGORYSItem,
+    InputText,
+    Button
   },
   created(){
      this.useStore = useStore();
@@ -151,13 +155,22 @@ export default {
 }
 </script>
 
-<style>
-.navbar-nav li:hover>.dropdown-menu {
+<style scoped>
+.navbar-nav li:hover > .dropdown-menu {
   display: block;
-  margin-top: 0px;
+  margin-top: 0;
 }
-.navbar-nav li .dropdown-menu .dropright:hover>.dropdown-menu{
+
+.navbar-nav li .dropdown-menu .dropright:hover > .dropdown-menu {
   display: block;
   margin-left: -5px;
+}
+
+.search-input {
+  min-width: 220px;
+}
+
+.search-button {
+  padding-inline: 1rem;
 }
 </style>
