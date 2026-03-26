@@ -83,6 +83,21 @@ function r($var){
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><?php echo $title ?></title>
     <meta name="google-site-verification" content="eJzSKHIa-n-JOE7VpCQZ2sH_gCTcIVDcOChcsdzbb3w" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'Noto Sans TC', 'system-ui', 'sans-serif']
+            }
+          }
+        }
+      }
+      document.documentElement.classList.add('dark')
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <noscript>

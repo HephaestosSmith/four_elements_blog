@@ -7,7 +7,7 @@
         <div class="input-group mb-3">
           <input type="password" class="form-control" placeholder="Password" v-model="password">
         </div>
-        <a class="btn btn-info" @click="login()"  style="width:100px; height:35px;">登入</a>
+        <a class="btn btn-info w-100px h-35" @click="login()">登入</a>
         </form>
     </div>
     <div class="alert alert-danger d-flex align-items-center" role="alert" v-if= Alertflag>
