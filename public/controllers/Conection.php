@@ -3,8 +3,8 @@
 # Type="MYSQL"
 # HTTP="true"
 header("content-type:text/html; charset=utf-8");
-$hostname_gb =  "mysql";
-$database_gb =  "blog_db2";
+$hostname_gb =  "blog_mysql";
+$database_gb =  "blog";
 $username_gb =  "root";
 $password_gb =  "find003paw203";
 

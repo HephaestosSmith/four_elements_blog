@@ -34,8 +34,6 @@
 import HeaderMAINCATEGORYSItem from '../components/HeaderMAINCATEGORYSItem.vue'
 import { useStore } from 'vuex'
 import Cookies from 'vue-cookie'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
 
 export default {
   inject: [
@@ -49,9 +47,7 @@ export default {
       };
   },
   components: {
-    HeaderMAINCATEGORYSItem,
-    InputText,
-    Button
+    HeaderMAINCATEGORYSItem
   },
   created(){
      this.useStore = useStore();
