@@ -1,13 +1,12 @@
 <template>
-<div class="container-fluid" id="main"  :key="display">
-  <div class="row bg-dark sticky-top"  id="Header">
+<div class="container-fluid app-shell" id="main" :key="display">
+  <div class="row app-header sticky-top" id="Header">
     <div class="col-12">
      <router-view name="Header"/>
     </div>
   </div>
-  <div class="row">
-    <div class="d-none d-md-block col-md-2 bd-toc">
-    </div>
+  <div class="row app-layout">
+    <div class="d-none d-md-block col-md-2 bd-toc"></div>
     <div class="col-md-8 main">
        <router-view/>
     </div>
@@ -24,16 +23,18 @@
         <button type="button" class="close text-danger" data-dismiss="modal">X</button>
       </div>
 
-      <!-- Modal body -->
-      <div class="modal-body modal-body-scrollable">
-       <router-view name="modal"/>
+    <div class="modal fade" id="ModalView">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content app-modal-content">
+          <div class="col-sm-12 sticky-10 modal-close-row">
+            <button type="button" class="close text-danger" data-dismiss="modal">X</button>
+          </div>
+
+          <div class="modal-body modal-body-scrollable">
+           <router-view name="modal"/>
+          </div>
+        </div>
       </div>
-
-      <!-- Modal footer
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" @click="close()" >Close</button>
-      </div> -->
-
     </div>
   </div>
 </div>
@@ -65,7 +66,7 @@ export default {
      }
   },
   created() {
-     document.getElementsByTagName("body")[0].className="bg-secondary";
+     document.body.className = 'app-body';
      this.useStore = useStore();
   },
   methods: {

@@ -91,15 +91,16 @@ export default {
 }
 </script>
 
-<style>
-.nav-item .dropdown-item:hover, .dropdown-item:focus {
-    cursor: pointer;
-    color: rgba(255, 255, 255, 1);
-    text-decoration: none;
-    background-color: rgba(0, 0, 0, 0);
+<style scoped>
+.nav-item .dropdown-item:hover,
+.dropdown-item:focus {
+  cursor: pointer;
+  color: rgba(255, 255, 255, 1);
+  text-decoration: none;
+  background-color: rgba(79, 140, 255, 0.18);
 }
 
 .nav-item .dropdown-item {
-    color: rgba(255, 255, 255, 0.5);
+  color: rgba(230, 237, 247, 0.78);
 }
 </style>
