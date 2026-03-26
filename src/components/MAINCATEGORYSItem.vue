@@ -1,5 +1,5 @@
 <template>
-      <div class=" rounded article" style="overflow: hidden;">
+      <div class="rounded article overflow-hidden">
         <h5>分類</h5>
         <div class="menulist" v-for="(item,index) in MAINCATEGORYS" :key="index">
         <div class="menutitle" @click="item.ISSHOW = !item.ISSHOW">

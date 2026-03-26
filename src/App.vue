@@ -20,8 +20,8 @@
   <div class="modal-dialog modal-xl">
     <div class="modal-content bg-secondary">
       <!-- Modal Header -->
-      <div class="col-sm-12" style="position: sticky;top: 10px;z-index: 1000;">
-        <button type="button" class="close" data-dismiss="modal" style="color:red;">X</button>
+      <div class="col-sm-12 sticky-10">
+        <button type="button" class="close text-danger" data-dismiss="modal">X</button>
       </div>
 
       <!-- Modal body -->
@@ -38,21 +38,26 @@
   </div>
 </div>
   </div>
-  
+  <FooterView />
+
 </div>
 </template>
 <script>
 import { useStore } from 'vuex'
 import { Modal } from "bootstrap"
+import FooterView from './views/FooterView.vue'
 
 export default {
-  provide(){    
+  provide(){
     return {
-      reload: this.reload,      
+      reload: this.reload,
       conection: this.conection,
       modalshow:this.modalshow,
       PrismView:this.PrismView
     }
+  },
+  components:{
+    FooterView
   },
   data() {
     return {
@@ -88,10 +93,11 @@ export default {
   }
 }
 </script>
-<style lang="scss">
-#Footer{  
-  background-color: rgb(45, 45, 45);
-  color: rgb(112, 112, 112);
+<style scoped lang="scss">
+@import './css/variables.scss';
+#Footer{
+  background-color: $bg-color;
+  color: $text-muted-color;
   text-align: left;
 }
 .article {
@@ -106,5 +112,4 @@ img{
   max-height: 100%;
   max-width: 100%;
 }
-@import './css/custom.css';
 </style>

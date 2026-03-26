@@ -2,8 +2,9 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import store from './store'
 import router from './router'
-import "bootstrap" 
+import "bootstrap"
 import "bootstrap/scss/bootstrap.scss"
+import './css/custom.css'
 import axios from 'axios'
 import Cookies from 'vue-cookie'
 import CKEditor from '@ckeditor/ckeditor5-vue'
