@@ -33,7 +33,7 @@
           <span class="input-group-text">發文名稱</span>
           <input type="text" class="form-control" placeholder="發文名稱" v-model="AUTHORNAME">
         </div>
-        <a class="btn btn-info" @click="install()"  style="width:100px; height:35px;">安裝</a>
+        <a class="btn btn-info w-100px h-35" @click="install()">安裝</a>
         </form>
     </div>
     <div class="alert alert-danger d-flex align-items-center" role="alert" v-if= Alertflag>

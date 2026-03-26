@@ -151,12 +151,13 @@ export default {
 }
 </script>
 
-<style>
-.navbar-nav li:hover>.dropdown-menu {
+<style scoped>
+.navbar-nav li:hover > .dropdown-menu {
   display: block;
-  margin-top: 0px;
+  margin-top: 0;
 }
-.navbar-nav li .dropdown-menu .dropright:hover>.dropdown-menu{
+
+.navbar-nav li .dropdown-menu .dropright:hover > .dropdown-menu {
   display: block;
   margin-left: -5px;
 }

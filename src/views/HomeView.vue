@@ -6,44 +6,44 @@
              <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
              </div>
          </div>
-        <div style="height:8px;"/>
+        <div class="spacer-8"></div>
          <div class="row">
-             <div class="col-sm-2 text-white" style="margin-top: 5px;">
+             <div class="col-sm-2 text-white mt-5px">
                文章顯示:
              <select class="form-select" v-model="POWER">
                <option value="0">公開</option>
                <option value="1" selected>不公開</option>
              </select>
              </div>
-             <div class="col-sm-4" style="margin-top: 5px;">
+             <div class="col-sm-4 mt-5px">
                <div class="row">
-                  <div class="col-4" style="padding-right: 5px;padding-left: 10px;">
-                     <select class="form-select"  v-model="MAINCATEGORY" style="width: inherit;">
+                  <div class="col-4 pr-5 pl-10">
+                     <select class="form-select w-inherit"  v-model="MAINCATEGORY">
                        <option value=""></option>
                        <option  v-for="(item,index) in MAINCATEGORYS" :key="index">{{ item }}</option>
                      </select>
                   </div>
-                  <div class="col-8" style="padding-right: 0px;padding-left: 0px;">
-                     <input type="text" class="form-control" placeholder="主分類"  v-model="MAINCATEGORY" style="height: 25px;" >
+                  <div class="col-8 pr-0 pl-0">
+                     <input type="text" class="form-control h-25" placeholder="主分類"  v-model="MAINCATEGORY" >
                   </div>
                </div>
              </div>
-             <div class="col-sm-4" style="margin-top: 5px;">
+             <div class="col-sm-4 mt-5px">
                <div class="row">
-                  <div class="col-4" style="padding-right: 5px;padding-left: 10px;">
-                     <select class="form-select"  v-model="SUBCATEGORY" style="width: inherit;">
+                  <div class="col-4 pr-5 pl-10">
+                     <select class="form-select w-inherit"  v-model="SUBCATEGORY">
                        <option value=""></option>
                        <option  v-for="(item,index) in SUBCATEGORYS" :key="index">{{ item }}</option>
                      </select>
                   </div>
-                  <div class="col-8" style="padding-right: 0px;padding-left: 0px;">
-                     <input type="text" class="form-control" placeholder="子分類"  v-model="SUBCATEGORY" style="height: 25px;" >
+                  <div class="col-8 pr-0 pl-0">
+                     <input type="text" class="form-control h-25" placeholder="子分類"  v-model="SUBCATEGORY" >
                   </div>
                </div>
              </div>
-             <div class="col-sm-2" style="margin-top: 5px;">
-             <a class="btn btn-primary" @click="PrismView()"  style="height:35px; margin-right: 5px;">預覽</a>
-             <a class="btn btn-primary" @click="post()"  style="height:35px;">發表</a>
+             <div class="col-sm-2 mt-5px">
+             <a class="btn btn-primary h-35 mr-5px" @click="PrismView()">預覽</a>
+             <a class="btn btn-primary h-35" @click="post()">發表</a>
              </div>
          </div>
       </div>
@@ -53,7 +53,7 @@
     </div>
     <div class="row">
       <div class="col">
-         <div style="height:20px"/>
+         <div class="spacer-20"></div>
       </div>
     </div>
     <div class="row" v-if="this.useStore.state.homeloadflag">
@@ -82,7 +82,7 @@
       </div>
     </div>
     <div class="rounded text-wrap article row"  v-if="noData()">
-             <div class="col-12 text-white" style="text-align: center;font-weight: bold;">
+             <div class="col-12 text-white text-center fw-bold">
                查無資料
              </div>
     </div>
