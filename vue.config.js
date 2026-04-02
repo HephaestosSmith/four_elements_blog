@@ -2,6 +2,7 @@ const { defineConfig } = require('@vue/cli-service')
 const path = require( 'path' );
 const CKEditorWebpackPlugin = require( '@ckeditor/ckeditor5-dev-webpack-plugin' );
 const { styles } = require( '@ckeditor/ckeditor5-dev-utils' );
+const apiProxyTarget = process.env.VUE_APP_API_PROXY_TARGET || 'http://localhost:8000/';
 
 module.exports = defineConfig({
   parallel: false,
@@ -9,12 +10,12 @@ module.exports = defineConfig({
        /ckeditor5-[^/\\]+[/\\]src[/\\].+\.js$/,
    ],
   devServer:{
-       host:'localhost',
+       host:'0.0.0.0',
        port:8080,
        open:true,
        proxy:{
          '/api':{
-           target:'http://localhost/',
+           target:apiProxyTarget,
            changeOrigin:true,
            pathRewrite:{
              '^/api':''
