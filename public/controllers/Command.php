@@ -1,68 +1,83 @@
 <?php
-  include 'ReturnResult.php';
-  main();
-  function main(){
-    $commandType = $_POST['commandType'];
-    
-    switch($commandType){
-       case "login":
-        LoginResult($_POST['username'],$_POST['password']);
+include 'ReturnResult.php';
+
+/**
+ * 以 Laravel Controller 風格重整入口：
+ * - 保留既有 API 路徑（/controllers/Command.php）
+ * - 保留 commandType 與回傳格式
+ * - 既有商業邏輯函式不變，只調整調度方式
+ */
+class CommandController
+{
+  public function handle(array $request): void
+  {
+    $commandType = $request['commandType'] ?? '';
+
+    switch ($commandType) {
+      case 'login':
+        LoginResult($request['username'] ?? '', $request['password'] ?? '');
         break;
-       case "check":
+      case 'check':
         CheckResult();
         break;
-       case "checkPOWER":
+      case 'checkPOWER':
         CheckPOWERResult();
         break;
-       case "post":
+      case 'post':
         PostResult();
         break;
-       case "getAticle":
-         AticleResult($_POST['SEARCHTYPE'],$_POST['KEYWORD']);
-         break;
-       case  "getMAINCATEGORYS":
-         MAINCATEGORYSResult();
-         break;
-       case  "getSUBCATEGORYS":
-         SUBCATEGORYSResult();
-         break;
-       case  "delete":
-         DeleteResult($_POST['UUID']);
-         break;
-       case  "update":
-         UpdateResult($_POST['UUID'],$_POST['MTDT']);
-         break;
-       case  "gethomename":
-         HomeNameResult();
-         break;
-       case "getTitle":
-         getTitle();
-         break;
-       case "getALLCATEGORYS":
-         ALLCATEGORYSResult();
-         break;
-          
+      case 'getAticle':
+        AticleResult($request['SEARCHTYPE'] ?? 'default', $request['KEYWORD'] ?? '');
+        break;
+      case 'getMAINCATEGORYS':
+        MAINCATEGORYSResult();
+        break;
+      case 'getSUBCATEGORYS':
+        SUBCATEGORYSResult();
+        break;
+      case 'delete':
+        DeleteResult($request['UUID'] ?? '');
+        break;
+      case 'update':
+        UpdateResult($request['UUID'] ?? '', $request['MTDT'] ?? '');
+        break;
+      case 'gethomename':
+        HomeNameResult();
+        break;
+      case 'getTitle':
+        getTitle();
+        break;
+      case 'getALLCATEGORYS':
+        ALLCATEGORYSResult();
+        break;
+      default:
+        $arr = array('null' => '');
+        echo OutputResult('無效請求', '0', $arr);
+        break;
     }
   }
-  
-  //回傳檢查結果 FOR VUE
-  function AticleResult($SEARCHTYPE,$KEYWORD){
-    switch($SEARCHTYPE){
-      case "default":
-        DefaultResult();
-       break;
-      case "KEYWORD":
-        $KEYWORD = "%".$KEYWORD."%";
-        KeywordResult($KEYWORD);
-       break;
-      case "CONTENT":
-        CONTENTResult($KEYWORD);
-       break;
-       case "CATEGORY":
-        CATEGORYResult($KEYWORD);
-        break;
-   }
+}
+
+(new CommandController())->handle($_POST);
+
+//回傳檢查結果 FOR VUE
+function AticleResult($SEARCHTYPE, $KEYWORD){
+  switch($SEARCHTYPE){
+    case "default":
+      DefaultResult();
+      break;
+    case "KEYWORD":
+      $KEYWORD = "%".$KEYWORD."%";
+      KeywordResult($KEYWORD);
+      break;
+    case "CONTENT":
+      CONTENTResult($KEYWORD);
+      break;
+    case "CATEGORY":
+      CATEGORYResult($KEYWORD);
+      break;
   }
+}
   function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
   {
   switch ($theType) {

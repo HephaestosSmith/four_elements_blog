@@ -1,52 +1,59 @@
 <?php
 include 'ReturnResult.php';
-main();
 
+/**
+ * 以 Laravel Controller 風格重整入口，保留原有 /controllers/Install.php 路徑與邏輯。
+ */
+class InstallController
+{
+    public function handle(array $request): void
+    {
+        $path = './Conection.php';
+        $arr = array('null' => '');
 
-function main(){
-    $path = './Conection.php';
-    $arr = array('null' => "");
-    if (file_exists($path)) {
-        echo OutputResult("已安裝完成","1",$arr);
-        //getTitle();
-    } else {
-        if(!isset($_POST['HOME']) || $_POST['HOME'] == ""){
-            echo OutputResult("請輸入網站名稱","0",$arr);
-        }else if(!isset($_POST['hostname_gb']) || $_POST['hostname_gb'] == ""){
-            echo OutputResult("請輸入資料庫網址","0",$arr);
-        }else if(!isset($_POST['database_gb']) || $_POST['database_gb'] == ""){
-            echo OutputResult("請輸入資料庫名稱","0",$arr);
-        }else if(!isset($_POST['username_gb']) || $_POST['username_gb'] == ""){
-            echo OutputResult("請輸入資料庫使用者","0",$arr);
-        }else if(!isset($_POST['password_gb']) || $_POST['password_gb'] == ""){
-            echo OutputResult("請輸入資料庫密碼","0",$arr);
-        }else if(!isset($_POST['USERNAME']) || $_POST['USERNAME'] == ""){
-            echo OutputResult("請輸入登入帳號","0",$arr);
-        }else if(!isset($_POST['PASSWORD']) || $_POST['PASSWORD'] == ""){
-            echo OutputResult("請輸入登入密碼","0",$arr);
-        }else if(!isset($_POST['AUTHORNAME']) || $_POST['AUTHORNAME'] == ""){
-            echo OutputResult("請輸入發文名稱","0",$arr);
-        }else/*if(true)*/{
-            try{
-                $conn = new mysqli($_POST['hostname_gb'],$_POST['username_gb'],$_POST['password_gb']);
-                if(CreateDATABASE($conn)){
-                    $db = new mysqli($_POST['hostname_gb'],$_POST['username_gb'],$_POST['password_gb'],$_POST['database_gb']);
-                    if($db->connect_error){
-                        echo OutputResult("資料庫建立失敗:". $db->connect_error,"0",$arr);
-                    } else if (CreateTable($db)){
-                        CreateConection();
-                        echo OutputResult("安裝完成","1",$arr);
-                    }else{
-                        echo OutputResult("安裝失敗","0",$arr);
-                    }
+        if (file_exists($path)) {
+            echo OutputResult('已安裝完成', '1', $arr);
+            return;
+        }
+
+        $requiredFields = [
+            'HOME' => '請輸入網站名稱',
+            'hostname_gb' => '請輸入資料庫網址',
+            'database_gb' => '請輸入資料庫名稱',
+            'username_gb' => '請輸入資料庫使用者',
+            'password_gb' => '請輸入資料庫密碼',
+            'USERNAME' => '請輸入登入帳號',
+            'PASSWORD' => '請輸入登入密碼',
+            'AUTHORNAME' => '請輸入發文名稱',
+        ];
+
+        foreach ($requiredFields as $field => $message) {
+            if (!isset($request[$field]) || $request[$field] === '') {
+                echo OutputResult($message, '0', $arr);
+                return;
+            }
+        }
+
+        try {
+            $conn = new mysqli($request['hostname_gb'], $request['username_gb'], $request['password_gb']);
+            if (CreateDATABASE($conn)) {
+                $db = new mysqli($request['hostname_gb'], $request['username_gb'], $request['password_gb'], $request['database_gb']);
+                if ($db->connect_error) {
+                    echo OutputResult('資料庫建立失敗:' . $db->connect_error, '0', $arr);
+                } else if (CreateTable($db)) {
+                    CreateConection();
+                    echo OutputResult('安裝完成', '1', $arr);
+                } else {
+                    echo OutputResult('安裝失敗', '0', $arr);
                 }
             }
-            catch(Exception $e) {
-                echo OutputResult("資料庫連線失敗:".$e->getMessage(),"0",$arr);
-            }   
+        } catch (Exception $e) {
+            echo OutputResult('資料庫連線失敗:' . $e->getMessage(), '0', $arr);
         }
     }
-  }
+}
+
+(new InstallController())->handle($_POST);
 function CreateDATABASE($con){
     //建立資料庫 
     $sql = "CREATE DATABASE ".$_POST['database_gb']." CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
