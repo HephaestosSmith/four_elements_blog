@@ -18,15 +18,15 @@ services:
       timeout: 20s
       retries: 10
 
-  php:
+  backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
-    container_name: blog_php
+    container_name: blog_backend
     ports:
-      - "80:80"
+      - "8000:80"
     volumes:
-      - ./public:/var/www/html
+      - ./backend/public:/var/www/html
     depends_on:
       mysql:
         condition: service_healthy
@@ -35,6 +35,20 @@ services:
       - MYSQL_USER=root
       - MYSQL_PASSWORD=find003paw203
       - MYSQL_DB=blog_db
+
+  frontend:
+    image: node:18
+    container_name: blog_frontend
+    working_dir: /app
+    command: sh -c "npm install && npm run serve"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app
+    environment:
+      - VUE_APP_API_PROXY_TARGET=http://backend/
+    depends_on:
+      - backend
 
 volumes:
   mysql_data:
